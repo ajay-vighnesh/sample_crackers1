@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Sri Lakshmi Pyro Crackers - Home</title>
+  <link rel="icon" href="img/LP_CMYK.png">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/themify-icons.css">
+  <link rel="stylesheet" href="css/all.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+
+    /* ================================================
+       CASE 3 — TOP MARQUEE RUNNING TEXT BAR
+    ================================================ */
+    #marqueeBar {
+  background: #1565c0;
+  color: #fff;
+  padding: 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  white-space: nowrap;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10001;
+}
+
+    #marqueeBar .marquee-track {
+      display: inline-block;
+      animation: marqueeScroll 40s linear infinite;
+          font-family: open sans-serif;
+    font-size: 20px;
+    }
+    #marqueeBar .marquee-track span {
+      margin: 0 40px;
+    }
+    #marqueeBar .marquee-track .highlight {
+      color: #FFD600;
+      font-weight: bolder;
+    }
+    @keyframes marqueeScroll {
+      0%   { transform: translateX(100vw); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* ================================================
+       CASE 4 — POPUP NOTIFICATION (dismissable)
+    ================================================ */
+    #popupNotice {
+      display: none; /* shown by JS on load */
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 99999;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+      padding: 32px 28px 24px 28px;
+      max-width: 480px;
+      width: 90%;
+      text-align: center;
+    }
+    #popupNotice .popup-close {
+      position: absolute;
+      top: 10px;
+      right: 16px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #555;
+      background: none;
+      border: none;
+      line-height: 1;
+    }
+    #popupNotice .popup-close:hover { color: #c00; }
+    #popupNotice p {
+      font-size: 14px;
+      line-height: 1.8;
+      color: #333;
+      margin: 0;
+    }
+    #popupOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 99998;
+    }
+
+    /* ================================================
+       CASE 2 — WHATSAPP FLOATING BUTTON
+    ================================================ */
+    #whatsappBtn {
+      position: fixed;
+      bottom: 24px;
+      left: 20px;
+      z-index: 9997;
+      width: 56px;
+      height: 56px;
+      background: #25D366;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      text-decoration: none;
+      transition: transform 0.2s;
+    }
+    #whatsappBtn:hover { transform: scale(1.1); }
+    #whatsappBtn svg {
+      width: 32px;
+      height: 32px;
+      fill: #fff;
+    }
+
+    /* ================================================
+       CASE 1 — CONTACT NOW PARALLAX SECTION
+    ================================================ */
+    .contact-parallax {
+      background-image: url('img/banner/front_banner_2.jpg');
+      background-attachment: fixed;   /* parallax scroll effect */
+      background-size: cover;
+      background-position: center;
+      min-height: 340px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+    }
+    .contact-parallax::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.52);
+    }
+    .contact-parallax .parallax-content {
+      position: relative;
+      z-index: 1;
+      padding: 20px;
+    }
+    .contact-parallax h2 {
+      color: #fff;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+    .contact-parallax p {
+      color: #e0e0e0;
+      font-size: 16px;
+      margin-bottom: 24px;
+    }
+    .contact-parallax .btn-contact {
+      background: #FFD600;
+      color: #111;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 12px 36px;
+      border-radius: 6px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .contact-parallax .btn-contact:hover { background: #FFC200; }
+
+    /* mobile: parallax fallback (fixed doesn't work on iOS) */
+    @media (max-width: 600px) {
+      .contact-parallax {
+        background-attachment: scroll;
+      }
+      .contact-parallax h2 { font-size: 22px; }
+    }
+
+  </style>
+</head>
+<body style="padding-top: 38px;">
+
+
+<!-- ================================================
+     CASE 3: TOP RUNNING MARQUEE BAR
+================================================ -->
+<!-- <div id="marqueeBar">
+  <div class="marquee-track">
+    <span>🎆 <span class="highlight">50% Discount Offer</span> on all crackers!</span>
+    <span>📞 Call Us: <span class="highlight">+91 8015957548</span></span>
+    <span>🎇 Minimum Order: <span class="highlight">Rs. 2000/-</span></span>
+    <span>🎆 <span class="highlight">கடைசி நேரத்தில் ஆர்டர் செய்வதை தவிருங்கள்!</span></span>
+    <span>📞 Call Us: <span class="highlight">+91 8015957548</span></span>
+    <span>🎆 <span class="highlight">50% Discount Offer</span> on all crackers!</span>
+    <span>✉️ srilakshmipyrotech@gmail.com</span>
+  </div>
+</div> -->
+
+<!-- ================================================
+     CASE 4: POPUP NOTIFICATION OVERLAY + BOX
+================================================ -->
+<div id="popupOverlay"></div>
+<div id="popupNotice">
+  <button class="popup-close" id="popupClose">&#215;</button>
+  <img src="img/LP_CMYK.png" style="height:50px; margin-bottom:14px;">
+  <p>
+    <strong>As per the Supreme Court order, online sales are strictly prohibited.</strong><br><br>
+    On this site, you can only explore product and price details. For further enquiries, please contact us on
+    <strong style="color:#b71c1c;">+91 **********</strong>.<br><br>
+    We will confirm your order within 24 hrs through WhatsApp or phone call.
+  </p>
+  <a href="contact.html" style="display:inline-block;margin-top:16px;background:#b71c1c;color:#fff;padding:10px 28px;border-radius:6px;text-decoration:none;font-weight:700;">
+    Contact Now
+  </a>
+</div>
+
+<!-- ================================================
+     CASE 2: WHATSAPP FLOATING BUTTON
+     Change the number below (91XXXXXXXXXX)
+================================================ -->
+<a id="whatsappBtn"
+   href="https://wa.me/918015957548?text=Hi%2C%20I%20am%20interested%20in%20buying%20crackers%20from%20Sri%20Lakshmi%20Pyro%20Tech.%20Please%20share%20the%20price%20list."
+   target="_blank"
+   title="Chat on WhatsApp">
+  <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16 .5C7.44.5.5 7.44.5 16c0 2.83.74 5.49 2.03 7.8L.5 31.5l7.93-2.07A15.44 15.44 0 0016 31.5c8.56 0 15.5-6.94 15.5-15.5S24.56.5 16 .5zm0 28.3a12.73 12.73 0 01-6.5-1.78l-.47-.28-4.7 1.23 1.25-4.58-.31-.49A12.73 12.73 0 1116 28.8zm7-9.45c-.38-.19-2.26-1.12-2.61-1.24-.35-.13-.6-.19-.86.19-.25.38-.98 1.24-1.2 1.5-.22.25-.44.28-.82.09-.38-.19-1.6-.59-3.05-1.88-1.13-1-1.89-2.24-2.11-2.62-.22-.38-.02-.58.17-.77.17-.17.38-.44.57-.66.19-.22.25-.38.38-.63.13-.25.06-.47-.03-.66-.09-.19-.86-2.07-1.18-2.83-.31-.74-.63-.64-.86-.65h-.73c-.25 0-.66.09-1 .47-.35.38-1.32 1.29-1.32 3.14s1.35 3.64 1.54 3.89c.19.25 2.66 4.06 6.44 5.69.9.39 1.6.62 2.15.79.9.29 1.73.25 2.38.15.73-.11 2.26-.92 2.58-1.81.32-.89.32-1.65.22-1.81-.09-.16-.35-.25-.73-.44z"/>
+  </svg>
+</a>
+
+<!-- Top Contact Bar -->
+<div class="container mx-auto">
+  <div class="d-flex" style="justify-content:space-around">
+    <div class="mail_font"><i class="ti-mobile">&nbsp;</i>+91 8015957548</div>
+    <div class="mail_font"><i class="ti-email">&nbsp;</i>srilakshmipyrotech@gmail.com</div>
+  </div>
+</div>
+
+
+<div id="marqueeBar">
+  <div class="marquee-track">
+    <span>🎆 <span class="highlight">50% Discount Offer</span> on all crackers!</span>
+    <span>📞 Call Us: <span class="highlight">+91 8015957548</span></span>
+    <span>🎇 Minimum Order: <span class="highlight">Rs. 2000/-</span></span>
+    <span>🎆 <span class="highlight">கடைசி நேரத்தில் ஆர்டர் செய்வதை தவிருங்கள்!</span></span>
+    <span>📞 Call Us: <span class="highlight">+91 8015957548</span></span>
+    <span>🎆 <span class="highlight">50% Discount Offer</span> on all crackers!</span>
+    <span>✉️ srilakshmipyrotech@gmail.com</span>
+  </div>
+</div>
+
+
+<!-- Navbar -->
+<div class="main_menu menu_fixed home_menu mobile_menu_fixed">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-12">
+        <nav class="navbar navbar-expand-lg navbar-light">
+          <a class="navbar-brand" href="index.html"><img src="img/LP_CMYK.png" style="height:88px"></a>
+          <button class="navbar-toggler" data-toggle="collapse" data-target="#navbarNav">
+            <span class="menu_icon"></span>
+          </button>
+          <div class="collapse navbar-collapse main-menu-item" id="navbarNav">
+            <ul class="navbar-nav">
+              <li class="nav-item"><a class="nav-link active" href="home.html">Home</a></li>
+              <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+              <li class="nav-item"><a class="nav-link" href="shop.html">Shop</a></li>
+              <li class="nav-item"><a class="nav-link" href="gallery.html">Gallery</a></li>
+              <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Carousel Section -->
+<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+  <div class="carousel-inner" id="home">
+    <div class="carousel-item active"><img src="img/banner/front_banner_2.jpg" class="d-block w-100"></div>
+    <div class="carousel-item"><img src="img/banner/front_banner_3.jpg" class="d-block w-100"></div>
+    <div class="carousel-item"><img src="img/banner/front_banner_4.jpg" class="d-block w-100"></div>
+  </div>
+  <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev"><span class="carousel-control-prev-icon"></span></a>
+  <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next"><span class="carousel-control-next-icon"></span></a>
+</div>
+
+<!-- Products Section -->
+<section class="service_part section_padding">
+  <h1 class="text-center font-weight-bold text-success" style="padding:20px;">Products Categories</h1>
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-3 col-sm-6"><div class="single_service_part"><div class="single_service_text"><span><img src="img/banner/7.png"></span><h2>Lars</h2></div></div></div>
+      <div class="col-lg-3 col-sm-6"><div class="single_service_part"><div class="single_service_text"><span><img src="img/banner/11.png"></span><h2>Single Sound</h2></div></div></div>
+      <div class="col-lg-3 col-sm-6"><div class="single_service_part"><div class="single_service_text"><span><img src="img/banner/13.png"></span><h2>Atom Bomb</h2></div></div></div>
+      <div class="col-lg-3 col-sm-6"><div class="single_service_part"><div class="single_service_text"><span><img src="img/banner/12.png"></span><h2>Chakkars</h2></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================
+     CASE 1: CONTACT NOW — PARALLAX SECTION
+     (placed between product sections)
+================================================ -->
+<section class="contact-parallax">
+  <div class="parallax-content">
+    <h2>Have any questions related to our products?<br>Feel Free to Enquire Us!</h2>
+    <p>We are available 24 x 7. Order and let's celebrate together!</p>
+    <a href="contact.html" class="btn-contact">Contact Now</a>
+  </div>
+</section>
+
+<!-- Service part -->
+<section class="service_part section_padding">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-3 col-sm-6">
+        <div class="single_service_part"><div class="single_service_text">
+          <span><img src="img/banner/6.png" alt=""></span>
+          <h2>Rockets</h2>
+          <p>Over their the abund every placed thing them them winged you beginning forth</p>
+        </div></div>
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="single_service_part"><div class="single_service_text">
+          <span><img src="img/banner/14.png" alt=""></span>
+          <h2>Flower Pots</h2>
+          <p>Over their the abund every placed thing them them winged you beginning forth</p>
+        </div></div>
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="single_service_part"><div class="single_service_text">
+          <span><img src="img/banner/10.png" alt=""></span>
+          <h2>Bijili Crackers</h2>
+          <p>Over their the abund every placed thing them them winged you beginning forth</p>
+        </div></div>
+      </div>
+      <div class="col-lg-3 col-sm-6">
+        <div class="single_service_part"><div class="single_service_text">
+          <span><img src="img/banner/8.png" alt=""></span>
+          <h2>Sparklers</h2>
+          <p>Over their the abund every placed thing them them winged you beginning forth</p>
+        </div></div>
+      </div>
+    </div>
+
+    <div style="padding: 40px 0 0 0;">
+      <div class="cracker-banner text-center text-light d-flex align-items-center justify-content-center">
+        <div>
+          <h1 class="font-weight-bold text-warning mb-3">We are one of the leading sellers of .... Crackers</h1>
+          <h4 class="text-warning mb-4">We are available 24 x 7. Order and let's Purchase</h4>
+          <a href="/about.html" class="btn text-white px-4 py-2" style="background-color:#283b87;">About Us</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer-area" style="background:#b71c1c; color:#fff; padding: 40px 0 0 0;">
+  <div style="max-width:1200px; margin:0 auto; padding: 0 30px 30px 30px; display:flex; flex-wrap:wrap; gap:30px; justify-content:space-between;">
+
+    <div style="flex:1; min-width:200px;">
+      <img src="img/LP_CMYK.png" style="height:60px; margin-bottom:12px; filter:brightness(0) invert(1);">
+      <h4 style="color:#fff; font-size:18px; font-weight:700; margin-bottom:10px; border-bottom:2px solid #fff; padding-bottom:6px;">Sri Lakshmi Pyro Tech</h4>
+      <p style="font-size:13px; line-height:1.8; color:#f5f5f5;">If you are interested to buy diwali crackers online? Choose us!!! Shop quality and safe crackers at Sri Lakshmi Pyro Tech.</p>
+      <p style="font-size:13px; line-height:1.8; color:#f5f5f5; margin-top:8px;">We offer Sparklers, Ground Chakkars, Twinkling Stars, Rockets, Flower Pots, Atom Bombs and other Fancy Items.</p>
+    </div>
+
+    <div style="flex:1; min-width:150px;">
+      <h4 style="color:#fff; font-size:18px; font-weight:700; margin-bottom:10px; border-bottom:2px solid #fff; padding-bottom:6px;">Explore Us</h4>
+      <ul style="list-style:none; padding:0; margin:0;">
+        <li style="margin-bottom:10px;"><a href="home.html"    style="color:#f5f5f5; text-decoration:none; font-size:14px;">&#9658; Home</a></li>
+        <li style="margin-bottom:10px;"><a href="about.html"   style="color:#f5f5f5; text-decoration:none; font-size:14px;">&#9658; About Us</a></li>
+        <li style="margin-bottom:10px;"><a href="shop.html"    style="color:#f5f5f5; text-decoration:none; font-size:14px;">&#9658; Products</a></li>
+        <li style="margin-bottom:10px;"><a href="gallery.html" style="color:#f5f5f5; text-decoration:none; font-size:14px;">&#9658; Gallery</a></li>
+        <li style="margin-bottom:10px;"><a href="contact.html" style="color:#f5f5f5; text-decoration:none; font-size:14px;">&#9658; Contact Us</a></li>
+      </ul>
+    </div>
+
+    <div style="flex:1; min-width:200px;">
+      <h4 style="color:#fff; font-size:18px; font-weight:700; margin-bottom:10px; border-bottom:2px solid #fff; padding-bottom:6px;">Contact Info</h4>
+      <p style="font-size:13px; color:#f5f5f5; line-height:1.8; margin-bottom:8px;">&#128205; Your Address,<br>Sivakasi,<br>Tamil Nadu 626 XXX</p>
+      <p style="font-size:13px; color:#f5f5f5; margin-bottom:6px;">&#128241; (+91) 8015957548</p>
+      <p style="font-size:13px; color:#f5f5f5;">&#9993; srilakshmipyrotech@gmail.com</p>
+    </div>
+
+    <div style="flex:1; min-width:200px;">
+      <h4 style="color:#fff; font-size:18px; font-weight:700; margin-bottom:10px; border-bottom:2px solid #fff; padding-bottom:6px;">Reach Us</h4>
+      <iframe src="https://www.google.com/maps?q=Sivakasi,Tamil+Nadu&output=embed"
+        width="100%" height="180" style="border:0; border-radius:6px;" allowfullscreen loading="lazy"></iframe>
+    </div>
+
+  </div>
+
+  <div style="background:rgba(0,0,0,0.25); color:#fff; text-align:center; padding:20px 30px; font-size:13px; line-height:1.8;">
+    As per 2018 supreme court order, online sale of firecrackers are not permitted! We value our customers and at the same time, respect jurisdiction. We request you to add your products to the cart and submit the required crackers through the enquiry button. We will contact you within 24 hrs and confirm the order through WhatsApp or phone call. Our License No.——. Sri Lakshmi Pyro Tech following 100% legal &amp; statutory compliances. We send the parcels through registered and legal transport service providers.
+  </div>
+
+  <div style="background:rgba(0,0,0,0.4); color:#ccc; text-align:center; padding:12px; font-size:12px;">
+    &copy; Copyright Sri Lakshmi Pyro Tech. All Rights Reserved
+  </div>
+</footer>
+
+<script src="js/jquery-1.12.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/custom.js"></script>
+
+<script>
+  // CASE 4: Show popup on page load
+  window.addEventListener("load", function () {
+    document.getElementById("popupOverlay").style.display = "block";
+    document.getElementById("popupNotice").style.display  = "block";
+  });
+
+  // Close popup
+  document.getElementById("popupClose").addEventListener("click", function () {
+    document.getElementById("popupOverlay").style.display = "none";
+    document.getElementById("popupNotice").style.display  = "none";
+  });
+  document.getElementById("popupOverlay").addEventListener("click", function () {
+    document.getElementById("popupOverlay").style.display = "none";
+    document.getElementById("popupNotice").style.display  = "none";
+  });
+</script>
+
+</body>
+</html>

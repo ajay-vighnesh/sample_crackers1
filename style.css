@@ -1,0 +1,576 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+input {
+  display: block;
+  margin: 10px 0;
+  padding: 10px;
+  width: 200px;
+}
+
+button {
+  padding: 10px 10px;
+}
+
+
+
+
+/* .accordion {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+  transition: 0.4s;
+  border-radius: 10px;
+  
+} */
+
+
+.accordion {
+   background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 14px 18px;
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  font-weight: 700;
+  transition: background-color 0.3s;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+
+.active, .accordion:hover {
+  background-color: #ccc; 
+}
+
+.panel {
+  padding: 0 18px;
+  display: none;
+  background-color: white;
+  overflow: hidden;
+  
+}
+
+.accordion-style {
+  display: block;
+  width: 100%;          /* makes button/panel full width */
+  margin-bottom: 10px;  /* spacing between accordions */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+
+}
+
+/* cart style */
+
+#cartDrawer {
+  position: fixed;
+  top: 0;
+  right: -450px;
+  width: 450px;
+  height: 100vh;
+  background: #fff;
+  border-left: 2px solid #ccc;
+  box-shadow: -4px 0 10px rgba(0,0,0,0.2);
+  transition: right 0.4s ease;
+  z-index: 9999;
+  padding: 15px;
+  overflow-y: auto;
+}
+
+#cartDrawer.active {
+  right: 0;
+}
+
+.cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#closeCart {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+form input, form textarea {
+  width: 100%;
+  padding: 6px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+form button {
+  width: 100%;
+  padding: 10px;
+  background: #28a745;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+form button:hover {
+  background: #218838;
+}
+
+
+/* side cart animation  */
+
+
+
+/* 🔹 Cracker banner section */
+.cracker-banner {
+  background-image: url('/assets/image/bg-4.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  height: 320px;
+  opacity: 0.85;
+  position: relative;
+}
+
+/* Ensure text stays readable */
+.cracker-banner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.cracker-banner > div {
+  position: relative;
+  z-index: 1;
+}
+
+
+/* 🔹 Top Navigation Button Styling */
+.top-btn-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+}
+
+.nav-btn {
+  background-color: #283b87;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.nav-btn:hover {
+  background-color: #1f2f6e;
+}
+
+
+/* 🔹 Export Buttons */
+.export-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.export-btn {
+  background-color: #283b87;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.export-btn:hover {
+  background-color: #1f2f6e;
+}
+
+.export-btn.excel {
+  background-color: #217346; /* Excel green */
+}
+
+.export-btn.excel:hover {
+  background-color: #185b34;
+}
+
+.export-btn.pdf {
+  background-color: #d93025; /* PDF red */
+}
+
+.export-btn.pdf:hover {
+  background-color: #b2221c;
+}
+
+
+/* 🔹 Export + Pagination Layout */
+.export-pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+/* 🔹 Pagination Controls */
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+}
+
+/* 🔹 Export Buttons */
+.export-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.export-btn {
+  background-color: #283b87;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.export-btn:hover {
+  background-color: #1f2f6e;
+}
+
+.export-btn.excel {
+  background-color: #217346;
+}
+
+.export-btn.excel:hover {
+  background-color: #185b34;
+}
+
+.export-btn.pdf {
+  background-color: #d93025;
+}
+
+.export-btn.pdf:hover {
+  background-color: #b2221c;
+}
+
+#pagination {
+  margin-top: 15px;
+  text-align: center;
+}
+#pagination button {
+  margin: 0 4px;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  background-color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+#pagination button.active {
+  background-color: #283b87;
+  color: white;
+}
+#pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* Cart Icon */
+#cartIcon {
+    position: fixed;
+    top: 120px;
+    right: 20px;
+    width: 60px;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+/* Cart Drawer */
+#cartDrawer {
+    position: fixed;
+    top: 0;
+    right: -500px;
+    width: 450px;
+    height: 100%;
+    background: #fff;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+    transition: right 0.4s ease;
+    z-index: 9999;
+    overflow-y: auto;
+}
+
+#cartDrawer.active {
+    right: 0;
+}
+
+/* Cart Header */
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #ff6600;
+    color: white;
+}
+
+#closeCart {
+    border: none;
+    background: transparent;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+/* Cart Content */
+.cart-content {
+    padding: 15px;
+}
+
+.cart-content table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cart-content th,
+.cart-content td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.cart-content input,
+.cart-content textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+}
+
+.cart-content button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background: green;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.cart-content button[type="submit"]:hover {
+    background: darkgreen;
+}
+
+.image-modal{
+  display:none;
+  position:fixed;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.85);
+  z-index:99999;
+}
+
+.modal-image{
+  display:block;
+  max-width:90%;
+  max-height:90%;
+  margin:auto;
+  margin-top:30px;
+}
+
+#closeImageModal{
+  position:absolute;
+  top:20px;
+  right:30px;
+  color:#fff;
+  font-size:40px;
+  cursor:pointer;
+}
+
+
+#stickyBar .totals {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+#stickyBar .totals span {
+  background: rgba(255,255,255,0.15);
+  border-radius: 6px;
+  padding: 4px 12px;
+}
+
+#stickyBar .totals b {
+  color: #ffe600;
+}
+
+#stickyCartBtn {
+  background: white;
+  color: #1a1aff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+#stickyCartCount {
+  background: red;
+  color: white;
+  border-radius: 50%;
+  min-width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Push page content below sticky bar */
+body {
+  padding-top: 60px;
+}
+
+
+
+/* FIXED SUMMARY BAR */
+#stickyBar {
+  position: fixed;
+  top: 90px;
+  left: 0;
+  right: 0;
+  z-index: 9990;
+  background: #3a3a3a;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 24px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+  height: 56px;
+}
+#stickyBar .bar-totals {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+#stickyBar .bar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+}
+#stickyBar .bar-label {
+  font-size: 10px;
+  font-weight: 400;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 2px;
+}
+#stickyBar .bar-value {
+  background: #c62828;
+  color: #fff;
+  border-radius: 4px;
+  padding: 2px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  min-width: 55px;
+  text-align: center;
+}
+#stickyCartWrapper {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+#stickyCartIcon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+#stickyCartCount {
+  position: absolute;
+  top: -7px;
+  right: -9px;
+  background: #ff1744;
+  color: #fff;
+  border-radius: 50%;
+  min-width: 19px;
+  height: 19px;
+  line-height: 19px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: bold;
+}
+/* hide old floating cart */
+#cartContainer { display: none !important; }
+
+
+
+#loader{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:white;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    z-index:99999;
+}
+
+.spinner{
+    width:50px;
+    height:50px;
+    border:5px solid #ddd;
+    border-top:5px solid #e53935;
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+    from{transform:rotate(0deg);}
+    to{transform:rotate(360deg);}
+}
