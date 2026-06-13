@@ -9,8 +9,65 @@
   <link rel="stylesheet" href="css/themify-icons.css">
   <link rel="stylesheet" href="css/all.css">
   <link rel="stylesheet" href="css/style.css">
+
+
+  <style>
+  /* ================================================
+       CASE 3 — TOP MARQUEE RUNNING TEXT BAR
+    ================================================ */
+    #marqueeBar {
+  background: #1565c0;
+  color: #fff;
+  padding: 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  white-space: nowrap;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10001;
+}
+
+    #marqueeBar .marquee-track {
+      display: inline-block;
+      animation: marqueeScroll 40s linear infinite;
+          font-family: open sans-serif;
+    font-size: 20px;
+    }
+    #marqueeBar .marquee-track span {
+      margin: 0 40px;
+    }
+    #marqueeBar .marquee-track .highlight {
+      color: #FFD600;
+      font-weight: bolder;
+    }
+    @keyframes marqueeScroll {
+      0%   { transform: translateX(100vw); }
+      100% { transform: translateX(-100%); }
+    }
+
+  </style>
+
+
+
 </head>
 <body>
+
+
+  <div id="marqueeBar">
+  <div class="marquee-track">
+    <span>🎆 <span class="highlight">50% Discount Offer</span> on all crackers!</span>
+    <span>📞 Call Us: <span class="highlight">+91 8015957548</span></span>
+    <span>🎇 Minimum Order: <span class="highlight">Rs. 2000/-</span></span>
+    <span>🎆 <span class="highlight">கடைசி நேரத்தில் ஆர்டர் செய்வதை தவிருங்கள்!</span></span>
+    <span>📞 Call Us: <span class="highlight">+91 8015957548</span></span>
+    <span>🎆 <span class="highlight">50% Discount Offer</span> on all crackers!</span>
+    <span>✉️ srilakshmipyrotech@gmail.com</span>
+  </div>
+</div>
+
 
 <!-- Navbar -->
 <div class="main_menu menu_fixed home_menu mobile_menu_fixed">
@@ -18,7 +75,7 @@
     <div class="row align-items-center">
       <div class="col-lg-12">
         <nav class="navbar navbar-expand-lg navbar-light">
-          <a class="navbar-brand" href="index.html">
+          <a class="navbar-brand" href="Home.html">
             <img src="img/LP_CMYK.png" alt="logo" style="height:88px;">
           </a>
           <button class="navbar-toggler" data-toggle="collapse" data-target="#navbarNav">
@@ -26,7 +83,7 @@
           </button>
           <div class="collapse navbar-collapse main-menu-item" id="navbarNav">
             <ul class="navbar-nav">
-              <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+              <li class="nav-item"><a class="nav-link" href="home.html">Home</a></li>
               <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
               <li class="nav-item"><a class="nav-link" href="shop.html">Shop</a></li>
               <li class="nav-item"><a class="nav-link active" href="gallery.html">Gallery</a></li>

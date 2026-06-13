@@ -16,6 +16,20 @@
 
 <body>
 
+
+    <div id="marqueeBar">
+  <div class="marquee-track">
+    <span>🎆 <span class="highlight">50% Discount Offer</span> on all crackers!</span>
+    <span>📞 Call Us: <span class="highlight">+91 8015957548</span></span>
+    <span>🎇 Minimum Order: <span class="highlight">Rs. 2000/-</span></span>
+    <span>🎆 <span class="highlight">கடைசி நேரத்தில் ஆர்டர் செய்வதை தவிருங்கள்!</span></span>
+    <span>📞 Call Us: <span class="highlight">+91 8015957548</span></span>
+    <span>🎆 <span class="highlight">50% Discount Offer</span> on all crackers!</span>
+    <span>✉️ srilakshmipyrotech@gmail.com</span>
+  </div>
+</div>
+
+
     <!-- Navbar -->
     <div class="main_menu menu_fixed home_menu mobile_menu_fixed">
         <div class="container">
@@ -295,6 +309,44 @@ alert(result);
 </script>
 
     <style>
+
+          /* ================================================
+       CASE 3 — TOP MARQUEE RUNNING TEXT BAR
+    ================================================ */
+    #marqueeBar {
+  background: #1565c0;
+  color: #fff;
+  padding: 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  white-space: nowrap;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10001;
+}
+
+    #marqueeBar .marquee-track {
+      display: inline-block;
+      animation: marqueeScroll 40s linear infinite;
+          font-family: open sans-serif;
+    font-size: 20px;
+    }
+    #marqueeBar .marquee-track span {
+      margin: 0 40px;
+    }
+    #marqueeBar .marquee-track .highlight {
+      color: #FFD600;
+      font-weight: bolder;
+    }
+    @keyframes marqueeScroll {
+      0%   { transform: translateX(100vw); }
+      100% { transform: translateX(-100%); }
+    }
+
+    
         .mapouter,
         .gmap_canvas,
         .gmap_iframe {
