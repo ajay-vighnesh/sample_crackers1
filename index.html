@@ -172,6 +172,9 @@
     /* mobile: parallax fallback (fixed doesn't work on iOS) */
     @media (max-width: 600px) {
       .contact-parallax {
+         min-height: 220px;
+    object-fit: cover;
+    object-position: center;
         background-attachment: scroll;
       }
       .contact-parallax h2 { font-size: 22px; }
