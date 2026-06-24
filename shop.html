@@ -168,6 +168,36 @@
     font-weight: bold;
   }
 
+  /* =====================================================
+     OUT OF STOCK STATE
+  ===================================================== */
+  .out-of-stock-badge {
+    display: inline-block;
+    background: #757575;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    margin-left: 8px;
+  }
+  .product-row.is-out-of-stock {
+    opacity: 0.55;
+  }
+  .product-row.is-out-of-stock .product-image {
+    filter: grayscale(1);
+    cursor: pointer; /* still viewable */
+  }
+  .product-row.is-out-of-stock .minus,
+  .product-row.is-out-of-stock .plus {
+    cursor: not-allowed;
+    background: #e0e0e0 !important;
+    color: #9e9e9e !important;
+    pointer-events: none;
+  }
+
   /* ul reset */
   .panel ul {
     list-style: none;
@@ -572,7 +602,49 @@ document.getElementById("closeCart").addEventListener("click", () => {
 });
 
 const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbykZv9IH08pKKz7gFHEku9cSBxkziMcAuXoWYUZIGoSFcJ6gxfGA6os4sJNV8mDfqc/exec";
+  "https://script.google.com/macros/s/AKfycbwshx41MS4cn4AN26PSvyLKjRh2A3Vzlx1pWIC-9zITdxvOs1Isvz7YwYoMsQsJb_ic/exec";
+
+/* ============================================================
+   WHATSAPP NOTIFICATION CONFIG
+   ------------------------------------------------------------
+   Number that receives the order, in full international
+   format with NO "+", no spaces, no leading zero.
+   91 = India country code, followed by the 10-digit number.
+============================================================ */
+const WHATSAPP_NUMBER = "919443328086";
+
+/**
+ * Builds a readable order summary and opens WhatsApp
+ * (web.whatsapp.com / wa.me) with the message pre-filled.
+ * The customer (or owner, depending on device) only needs
+ * to tap Send — WhatsApp does not allow fully silent sends
+ * from a website for security reasons.
+ */
+function sendOrderToWhatsApp(details) {
+  const lines = [
+    "🧨 *New Order — Sri Lakshmi Pyro Tech*",
+    "",
+    `*Name:* ${details.name}`,
+    `*Email:* ${details.email}`,
+    `*Phone:* ${details.phone}`,
+    `*City:* ${details.city}`,
+    `*District:* ${details.district}`,
+    `*State:* ${details.state}`,
+    `*Address:* ${details.address}`,
+    `*Pincode:* ${details.pincode}`,
+    "",
+    "*Items:*",
+    details.products,
+    "",
+    `*Grand Total:* ${details.grandTotal}`
+  ];
+
+  const message = lines.join("\n");
+  const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+
+  // Opens in a new tab; on mobile this hands off to the WhatsApp app.
+  window.open(waUrl, "_blank");
+}
 
 document.getElementById("checkoutForm").addEventListener("submit", function (e) {
   e.preventDefault();
@@ -581,22 +653,40 @@ document.getElementById("checkoutForm").addEventListener("submit", function (e) 
     .map((item, index) => `${index + 1}. ${item.name} x ${item.qty}qty x ₹${item.price}`)
     .join("\n");
 
+  const orderDetails = {
+    name:       document.getElementById("custName").value,
+    email:      document.getElementById("custEmail").value,
+    phone:      document.getElementById("custPhone").value,
+    city:       document.getElementById("custCity").value,
+    district:   document.getElementById("custDistrict").value,
+    state:      document.getElementById("custState").value,
+    address:    document.getElementById("custAddress").value,
+    pincode:    document.getElementById("custPincode").value,
+    products:   products,
+    grandTotal: document.getElementById("grandTotal").textContent
+  };
+
   const formData = new FormData();
   formData.append("formType",   "order");
-  formData.append("name",       document.getElementById("custName").value);
-  formData.append("email",      document.getElementById("custEmail").value);
-  formData.append("phone",      document.getElementById("custPhone").value);
-  formData.append("city",       document.getElementById("custCity").value);
-  formData.append("district",   document.getElementById("custDistrict").value);
-  formData.append("state",      document.getElementById("custState").value);
-  formData.append("address",    document.getElementById("custAddress").value);
-  formData.append("pincode",    document.getElementById("custPincode").value);
-  formData.append("products",   products);
-  formData.append("grandTotal", document.getElementById("grandTotal").textContent);
+  formData.append("name",       orderDetails.name);
+  formData.append("email",      orderDetails.email);
+  formData.append("phone",      orderDetails.phone);
+  formData.append("city",       orderDetails.city);
+  formData.append("district",   orderDetails.district);
+  formData.append("state",      orderDetails.state);
+  formData.append("address",    orderDetails.address);
+  formData.append("pincode",    orderDetails.pincode);
+  formData.append("products",   orderDetails.products);
+  formData.append("grandTotal", orderDetails.grandTotal);
 
   fetch(SCRIPT_URL, { method: "POST", body: formData, mode: "no-cors" })
     .then(() => {
       alert("Order Submitted Successfully");
+
+      // Open WhatsApp with the order pre-filled, right after the
+      // sheet save succeeds and before the form/cart are cleared.
+      sendOrderToWhatsApp(orderDetails);
+
       document.getElementById("checkoutForm").reset();
       cart = {};
       renderCart();
@@ -719,13 +809,22 @@ async function loadCategories() {
       relatedCrackers.forEach(cracker => {
         const li = document.createElement("li");
 
+        // Normalize status text from the sheet ("Out of Stock" / "Live" / blank).
+        // Anything that isn't explicitly "Out of Stock" is treated as Live.
+        const statusRaw   = (cracker.status || "").toString().trim().toLowerCase();
+        const isOutOfStock = statusRaw === "out of stock";
+
+        const stockBadge = isOutOfStock
+          ? `<span class="out-of-stock-badge">Out of Stock</span>`
+          : "";
+
         // ── Product row uses CSS classes (no inline flex styles)
         // ── so @media queries can properly override on mobile
         li.innerHTML = `
-          <div class="product-row">
+          <div class="product-row${isOutOfStock ? ' is-out-of-stock' : ''}">
 
             <div class="product-left">
-              <span class="product-name">${cracker.name}</span>
+              <span class="product-name">${cracker.name}</span>${stockBadge}
               <div class="product-prices">
                 <del class="product-original">₹${cracker.originalPrice}</del>
                 <span class="product-offer">₹${cracker.offerPrice}</span>
@@ -739,9 +838,9 @@ async function loadCategories() {
                 class="product-image"
               >
               <div class="product-qty-controls">
-                <button class="minus">-</button>
+                <button class="minus" ${isOutOfStock ? "disabled" : ""}>-</button>
                 <span class="count">0</span>
-                <button class="plus">+</button>
+                <button class="plus" ${isOutOfStock ? "disabled" : ""}>+</button>
               </div>
             </div>
 
@@ -780,8 +879,11 @@ async function loadCategories() {
           renderCart();
         }
 
-        plusBtn.addEventListener("click",  () => { count++; updateDisplay(); });
-        minusBtn.addEventListener("click", () => { if (count > 0) { count--; updateDisplay(); } });
+        // Out-of-stock products can still be viewed but can't be added to cart.
+        if (!isOutOfStock) {
+          plusBtn.addEventListener("click",  () => { count++; updateDisplay(); });
+          minusBtn.addEventListener("click", () => { if (count > 0) { count--; updateDisplay(); } });
+        }
 
         ul.appendChild(li);
       });
