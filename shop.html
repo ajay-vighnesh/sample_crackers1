@@ -34,6 +34,32 @@
   <style>
 
 
+/* ===== LOADER ===== */
+#productLoader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 16px;
+}
+.loader-spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #f0d0c0;
+  border-top: 5px solid #b71c1c;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.loader-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+}
+
   /* ================================================
        CASE 3 — TOP MARQUEE RUNNING TEXT BAR
     ================================================ */
@@ -321,18 +347,18 @@
   </style>
 
 </head>
-<body style="padding-top: 160px;">
+<div style="padding-top: 160px;">
 
 
   <div id="marqueeBar">
   <div class="marquee-track">
     <span>🎆 <span class="highlight">50% Discount Offer</span> on all crackers!</span>
-    <span>📞 Call Us: <span class="highlight">+91 8015957548</span></span>
+    <span>📞 Call Us: <span class="highlight">+91 **********</span></span>
     <span>🎇 Minimum Order: <span class="highlight">Rs. 2000/-</span></span>
     <span>🎆 <span class="highlight">கடைசி நேரத்தில் ஆர்டர் செய்வதை தவிருங்கள்!</span></span>
-    <span>📞 Call Us: <span class="highlight">+91 8015957548</span></span>
+    <span>📞 Call Us: <span class="highlight">+91 **********</span></span>
     <span>🎆 <span class="highlight">50% Discount Offer</span> on all crackers!</span>
-    <span>✉️ srilakshmipyrotech@gmail.com</span>
+    <span>✉️ crackersname@gmail.com</span>
   </div>
 </div>
 
@@ -345,7 +371,8 @@
       <div class="col-lg-12">
         <nav class="navbar navbar-expand-lg navbar-light">
           <a class="navbar-brand" href="Home.html">
-            <img src="img/LP_CMYK.png" alt="logo" style="height:88px;">
+            <!-- <img src="img/LP_CMYK.png" alt="logo" style="height:88px;"> -->
+            <img src="img/footer-logo.png" alt="logo" style="height:88px;">
           </a>
           <button class="navbar-toggler" data-toggle="collapse" data-target="#navbarNav">
             <span class="menu_icon"></span>
@@ -425,7 +452,12 @@
 </div>
 
 <h2>Accordion</h2>
-<div id="categoryAccordion"></div>
+<div id="categoryAccordion">
+  <div id="productLoader">
+    <div class="loader-spinner"></div>
+    <div class="loader-text">Loading crackers… please wait</div>
+  </div>
+</div>
 
 <!-- Cart Drawer -->
 <div id="cartDrawer">
@@ -498,7 +530,9 @@
 
     <!-- Col 1: Company Info -->
     <div style="flex:1; min-width:200px;">
-      <img src="img/LP_CMYK.png" style="height:60px; margin-bottom:12px; filter:brightness(0) invert(1);">
+      <!-- <img src="img/LP_CMYK.png" style="height:60px; margin-bottom:12px; filter:brightness(0) invert(1);"> -->
+      <img src="img/footer-logo.png" style="height:60px; margin-bottom:12px; filter:brightness(0) invert(1);">
+
       <h4 style="color:#fff; font-size:18px; font-weight:700; margin-bottom:10px; border-bottom:2px solid #fff; padding-bottom:6px;">Sri Lakshmi Pyro Tech</h4>
       <p style="font-size:13px; line-height:1.8; color:#f5f5f5;">
         If you are interested to buy diwali crackers online? Choose us!!! Shop quality and safe crackers at Sri Lakshmi Pyro Tech. We are selling all kinds of crackers at the lowest price.
@@ -602,7 +636,7 @@ document.getElementById("closeCart").addEventListener("click", () => {
 });
 
 const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbwshx41MS4cn4AN26PSvyLKjRh2A3Vzlx1pWIC-9zITdxvOs1Isvz7YwYoMsQsJb_ic/exec";
+  "https://script.google.com/macros/s/AKfycbzyo3_hZU6thrf4X5D4rqvV6ZTBvl6d364WzkMvV8Szd8mja3amydF-hYSE0kLToyZu/exec";
 
 /* ============================================================
    WHATSAPP NOTIFICATION CONFIG
@@ -611,7 +645,7 @@ const SCRIPT_URL =
    format with NO "+", no spaces, no leading zero.
    91 = India country code, followed by the 10-digit number.
 ============================================================ */
-const WHATSAPP_NUMBER = "919443328086";
+const WHATSAPP_NUMBER = "919487028086";
 
 /**
  * Builds a readable order summary and opens WhatsApp
@@ -895,7 +929,10 @@ async function loadCategories() {
 
   } catch (err) {
     console.error(err);
-    alert("Unable to load products");
+     document.getElementById("categoryAccordion").innerHTML =
+      `<div style="text-align:center;padding:40px;color:#b71c1c;font-weight:600;">
+         Unable to load products. Please refresh the page.
+       </div>`;
   }
 }
 
