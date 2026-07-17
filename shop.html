@@ -344,6 +344,47 @@
     #outsideGrandTotal { font-size: 15px !important; }
     h2 { font-size: 18px; }
   }
+
+  /* =====================================================
+     PRODUCT MODAL — Photo / Video tabs
+  ===================================================== */
+  .modal-tabs {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+  .modal-tab {
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.5);
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s ease;
+  }
+  .modal-tab.active {
+    background: #ff6600;
+    border-color: #ff6600;
+  }
+  #modalVideoWrap {
+    position: relative;
+    width: min(90vw, 640px);
+    aspect-ratio: 16 / 9;
+    margin: 0 auto;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  #modalVideoWrap iframe,
+  #modalVideoWrap video {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
   </style>
 
 </head>
@@ -599,7 +640,19 @@
 
 <div id="imageModal" class="image-modal">
   <span id="closeImageModal">&times;</span>
-  <img id="modalImage" class="modal-image" src="" alt="Product Image">
+
+  <div class="modal-tabs" id="modalTabs">
+    <button type="button" class="modal-tab active" id="tabPhotoBtn" onclick="switchModalTab('photo')">📷 Photo</button>
+    <button type="button" class="modal-tab" id="tabVideoBtn" onclick="switchModalTab('video')" style="display:none;">🎬 Video</button>
+  </div>
+
+  <div id="modalPhotoPane">
+    <img id="modalImage" class="modal-image" src="" alt="Product Image">
+  </div>
+
+  <div id="modalVideoPane" style="display:none;">
+    <div id="modalVideoWrap"></div>
+  </div>
 </div>
 <script src="js/jquery-1.12.1.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
@@ -616,11 +669,11 @@ document.getElementById("stickyCartWrapper").addEventListener("click", () => {
 });
 
 document.getElementById("closeImageModal").addEventListener("click", () => {
-  document.getElementById("imageModal").style.display = "none";
+  closeProductModal();
 });
 document.getElementById("imageModal").addEventListener("click", (e) => {
   if (e.target.id === "imageModal") {
-    document.getElementById("imageModal").style.display = "none";
+    closeProductModal();
   }
 });
 
@@ -636,7 +689,7 @@ document.getElementById("closeCart").addEventListener("click", () => {
 });
 
 const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbzyo3_hZU6thrf4X5D4rqvV6ZTBvl6d364WzkMvV8Szd8mja3amydF-hYSE0kLToyZu/exec";
+  "https://script.google.com/macros/s/AKfycbw_A92bOqinpryd8UHykeUkeuxqovZWjEAxx_glxJwZFNaL6GHSqg_qk3U98NWKSIg_/exec";
 
 /* ============================================================
    WHATSAPP NOTIFICATION CONFIG
@@ -888,9 +941,7 @@ async function loadCategories() {
         const productImage = li.querySelector(".product-image");
 
         productImage.addEventListener("click", () => {
-  document.getElementById("modalImage").src = cracker.product_image;
-  // Use classList instead of display:block so flex centering works
-  document.getElementById("imageModal").style.display = "flex";
+  openProductModal(cracker);
 });
 
         let count = 0;
@@ -939,13 +990,83 @@ async function loadCategories() {
 loadCategories();
 
 document.getElementById("closeImageModal").addEventListener("click", () => {
-  document.getElementById("imageModal").style.display = "none";
+  closeProductModal();
 });
 document.getElementById("imageModal").addEventListener("click", (e) => {
   if (e.target.id === "imageModal") {
-    document.getElementById("imageModal").style.display = "none";
+    closeProductModal();
   }
 });
+
+/* ============================================================
+   PRODUCT MODAL — Photo / Video
+   ------------------------------------------------------------
+   cracker.video_url comes from the sheet (via Apps Script),
+   already converted to an embeddable link:
+     - YouTube  -> https://www.youtube.com/embed/VIDEO_ID
+     - Drive    -> https://drive.google.com/file/d/FILE_ID/preview
+     - Direct .mp4/.webm/.ogg links are played with <video>
+============================================================ */
+let currentModalVideoUrl = "";
+
+function openProductModal(cracker) {
+  document.getElementById("modalImage").src = cracker.product_image;
+  currentModalVideoUrl = (cracker.video_url || "").toString().trim();
+
+  const videoTabBtn = document.getElementById("tabVideoBtn");
+  videoTabBtn.style.display = currentModalVideoUrl ? "inline-block" : "none";
+
+  switchModalTab("photo");
+
+  // Use flex (not block) so the modal's existing centering still works
+  document.getElementById("imageModal").style.display = "flex";
+}
+
+function closeProductModal() {
+  document.getElementById("imageModal").style.display = "none";
+  // Clear the video iframe/video element so playback stops immediately
+  document.getElementById("modalVideoWrap").innerHTML = "";
+}
+
+function switchModalTab(tab) {
+  const photoPane = document.getElementById("modalPhotoPane");
+  const videoPane = document.getElementById("modalVideoPane");
+  const photoBtn  = document.getElementById("tabPhotoBtn");
+  const videoBtn  = document.getElementById("tabVideoBtn");
+  const videoWrap = document.getElementById("modalVideoWrap");
+
+  if (tab === "video" && currentModalVideoUrl) {
+    photoPane.style.display = "none";
+    videoPane.style.display = "block";
+    photoBtn.classList.remove("active");
+    videoBtn.classList.add("active");
+
+    // Build the embed only when the video tab is opened, so it
+    // doesn't load/autoplay silently in the background.
+    videoWrap.innerHTML = buildVideoEmbedHtml(currentModalVideoUrl);
+  } else {
+    photoPane.style.display = "block";
+    videoPane.style.display = "none";
+    photoBtn.classList.add("active");
+    videoBtn.classList.remove("active");
+
+    // Remove the video element so playback/audio stops.
+    videoWrap.innerHTML = "";
+  }
+}
+
+function buildVideoEmbedHtml(url) {
+  const safeUrl = url.replace(/"/g, "&quot;");
+  const lower   = url.toLowerCase();
+
+  if (lower.endsWith(".mp4") || lower.endsWith(".webm") || lower.endsWith(".ogg")) {
+    return `<video src="${safeUrl}" controls autoplay playsinline></video>`;
+  }
+
+  // YouTube embed links and Google Drive "/preview" links both
+  // work fine inside a plain iframe.
+  return `<iframe src="${safeUrl}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+}
 
 
 
