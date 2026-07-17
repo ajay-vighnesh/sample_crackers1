@@ -346,28 +346,37 @@
   }
 
   /* =====================================================
-     PRODUCT MODAL — Photo / Video tabs
+     PRODUCT MODAL — image with a YouTube-icon video trigger
   ===================================================== */
-  .modal-tabs {
+  #modalImageWrap {
+    position: relative;
+    display: inline-block;
+    max-width: 90vw;
+  }
+  #watchVideoBtn {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255,0,0,0.9);
     display: flex;
-    gap: 10px;
+    align-items: center;
     justify-content: center;
-    margin-bottom: 14px;
-  }
-  .modal-tab {
-    background: rgba(255,255,255,0.12);
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.5);
-    padding: 6px 18px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
     cursor: pointer;
-    transition: background .2s ease;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.5);
   }
-  .modal-tab.active {
-    background: #ff6600;
-    border-color: #ff6600;
+  #watchVideoBtn:hover {
+    background: #d90000;
+  }
+  #watchVideoBtn svg {
+    width: 26px;
+    height: 26px;
+    fill: #fff;
+    margin-left: 3px;
   }
   #modalVideoWrap {
     position: relative;
@@ -384,6 +393,18 @@
     height: 100%;
     border: 0;
     display: block;
+  }
+  #backToPhotoBtn {
+    display: block;
+    margin: 10px auto 0;
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.5);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
   }
   </style>
 
@@ -641,17 +662,18 @@
 <div id="imageModal" class="image-modal">
   <span id="closeImageModal">&times;</span>
 
-  <div class="modal-tabs" id="modalTabs">
-    <button type="button" class="modal-tab active" id="tabPhotoBtn" onclick="switchModalTab('photo')">📷 Photo</button>
-    <button type="button" class="modal-tab" id="tabVideoBtn" onclick="switchModalTab('video')" style="display:none;">🎬 Video</button>
-  </div>
-
   <div id="modalPhotoPane">
-    <img id="modalImage" class="modal-image" src="" alt="Product Image">
+    <div id="modalImageWrap">
+      <img id="modalImage" class="modal-image" src="" alt="Product Image">
+      <button type="button" id="watchVideoBtn" title="Watch Video" style="display:none;" onclick="showModalVideo()">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+    </div>
   </div>
 
   <div id="modalVideoPane" style="display:none;">
     <div id="modalVideoWrap"></div>
+    <button type="button" id="backToPhotoBtn" onclick="showModalPhoto()">📷 Back to Photo</button>
   </div>
 </div>
 <script src="js/jquery-1.12.1.min.js"></script>
@@ -999,13 +1021,14 @@ document.getElementById("imageModal").addEventListener("click", (e) => {
 });
 
 /* ============================================================
-   PRODUCT MODAL — Photo / Video
+   PRODUCT MODAL — image with an optional YouTube-icon trigger
    ------------------------------------------------------------
    cracker.video_url comes from the sheet (via Apps Script),
    already converted to an embeddable link:
      - YouTube  -> https://www.youtube.com/embed/VIDEO_ID
      - Drive    -> https://drive.google.com/file/d/FILE_ID/preview
      - Direct .mp4/.webm/.ogg links are played with <video>
+   If a product has no video link, the icon is hidden entirely.
 ============================================================ */
 let currentModalVideoUrl = "";
 
@@ -1013,10 +1036,10 @@ function openProductModal(cracker) {
   document.getElementById("modalImage").src = cracker.product_image;
   currentModalVideoUrl = (cracker.video_url || "").toString().trim();
 
-  const videoTabBtn = document.getElementById("tabVideoBtn");
-  videoTabBtn.style.display = currentModalVideoUrl ? "inline-block" : "none";
+  document.getElementById("watchVideoBtn").style.display =
+    currentModalVideoUrl ? "flex" : "none";
 
-  switchModalTab("photo");
+  showModalPhoto();
 
   // Use flex (not block) so the modal's existing centering still works
   document.getElementById("imageModal").style.display = "flex";
@@ -1028,31 +1051,18 @@ function closeProductModal() {
   document.getElementById("modalVideoWrap").innerHTML = "";
 }
 
-function switchModalTab(tab) {
-  const photoPane = document.getElementById("modalPhotoPane");
-  const videoPane = document.getElementById("modalVideoPane");
-  const photoBtn  = document.getElementById("tabPhotoBtn");
-  const videoBtn  = document.getElementById("tabVideoBtn");
-  const videoWrap = document.getElementById("modalVideoWrap");
+function showModalPhoto() {
+  document.getElementById("modalPhotoPane").style.display = "block";
+  document.getElementById("modalVideoPane").style.display = "none";
+  // Remove the video element so playback/audio stops.
+  document.getElementById("modalVideoWrap").innerHTML = "";
+}
 
-  if (tab === "video" && currentModalVideoUrl) {
-    photoPane.style.display = "none";
-    videoPane.style.display = "block";
-    photoBtn.classList.remove("active");
-    videoBtn.classList.add("active");
-
-    // Build the embed only when the video tab is opened, so it
-    // doesn't load/autoplay silently in the background.
-    videoWrap.innerHTML = buildVideoEmbedHtml(currentModalVideoUrl);
-  } else {
-    photoPane.style.display = "block";
-    videoPane.style.display = "none";
-    photoBtn.classList.add("active");
-    videoBtn.classList.remove("active");
-
-    // Remove the video element so playback/audio stops.
-    videoWrap.innerHTML = "";
-  }
+function showModalVideo() {
+  if (!currentModalVideoUrl) return;
+  document.getElementById("modalPhotoPane").style.display = "none";
+  document.getElementById("modalVideoPane").style.display = "block";
+  document.getElementById("modalVideoWrap").innerHTML = buildVideoEmbedHtml(currentModalVideoUrl);
 }
 
 function buildVideoEmbedHtml(url) {
