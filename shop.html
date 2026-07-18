@@ -819,6 +819,7 @@ function toggleAccordion(btn) {
 }
 
 let cart = {};
+let productControls = {}; // NEW: lets cart drawer +/- buttons update the matching product row
 
 // Update Cart UI
 function renderCart() {
@@ -835,7 +836,11 @@ function renderCart() {
       <td><img src="${item.image || 'img/default.png'}" width="50"></td>
       <td>${item.name}</td>
       <td>₹${item.price}</td>
-      <td>${item.qty}</td>
+      <td>
+        <input type="number" class="cart-qty-input" data-id="${item.id}"
+               value="${item.qty}" min="0"
+               style="width:55px;padding:5px;text-align:center;border:1px solid #ccc;border-radius:4px;">
+      </td>
       <td>₹${item.price * item.qty}</td>
       <td>
         <button class="delete-cart-item" style="border:none;background-color:white;" data-id="${item.id}"> 🗑️ </button>
@@ -846,6 +851,17 @@ function renderCart() {
     row.querySelector(".delete-cart-item").addEventListener("click", () => {
       delete cart[item.id];
       renderCart();
+    });
+
+    // NEW: cart drawer qty input — type a new quantity without deleting the item.
+    // This calls back into the product row's own setCount(), so the accordion
+    // list and cart drawer always stay in sync.
+    row.querySelector(".cart-qty-input").addEventListener("change", (e) => {
+      let newQty = parseInt(e.target.value, 10);
+      if (isNaN(newQty) || newQty < 0) newQty = 0;
+      if (productControls[item.id]) {
+        productControls[item.id].setCount(newQty);
+      }
     });
 
     grandTotal += item.price * item.qty;
@@ -985,6 +1001,15 @@ async function loadCategories() {
           }
           renderCart();
         }
+
+        // NEW: lets the cart drawer's +/- buttons drive this product's
+        // quantity directly, keeping the accordion row and cart in sync.
+        function setCount(newCount) {
+          if (newCount < 0) newCount = 0;
+          count = newCount;
+          updateDisplay();
+        }
+        productControls[cracker.id] = { setCount };
 
         // Out-of-stock products can still be viewed but can't be added to cart.
         if (!isOutOfStock) {
