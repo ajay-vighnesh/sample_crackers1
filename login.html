@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Murugan Crackers — Admin Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1C1B1F;
+    --spark:#E8A33D;
+    --spark-deep:#C1432E;
+    --text-soft:#6B6560;
+    --line:#E9E5DC;
+    --out:#C1432E;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:'Inter',sans-serif;
+    display:flex;
+    min-height:100vh;
+    color:#242224;
+  }
+  h1,h2,h3{ font-family:'Space Grotesk',sans-serif; letter-spacing:-0.01em; }
+
+  .side{
+    flex:1;
+    background:linear-gradient(135deg, #5B5FE8, #3EA9D6);
+    color:#fff;
+    padding:60px 50px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    min-width:0;
+  }
+  .side .brand{ display:flex; align-items:center; gap:10px; margin-bottom:60px; }
+  .brand-mark{
+    width:34px; height:34px; border-radius:9px;
+    background:radial-gradient(circle at 30% 30%, var(--spark), var(--spark-deep));
+    flex-shrink:0;
+  }
+  .side h1{ font-size:34px; line-height:1.25; margin:0 0 16px 0; font-weight:700; max-width:420px; }
+  .side p{ font-size:15px; opacity:0.92; max-width:420px; line-height:1.5; margin:0 0 32px 0; }
+  .feature{ display:flex; align-items:center; gap:12px; margin-bottom:16px; font-size:14px; }
+  .feature .dot{
+    width:34px; height:34px; border-radius:50%;
+    background:rgba(255,255,255,0.18);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+
+  .form-side{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px;
+    background:#fff;
+  }
+  .form-wrap{ width:100%; max-width:360px; }
+  .form-wrap h2{ font-size:26px; margin:0 0 6px 0; font-weight:700; }
+  .form-wrap .sub{ color:var(--text-soft); font-size:14px; margin:0 0 28px 0; }
+
+  label{ font-size:13px; font-weight:600; color:var(--text-soft); display:block; margin-bottom:6px; }
+  .field{ margin-bottom:18px; }
+  .input-wrap{ position:relative; }
+  input{
+    width:100%;
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    padding:11px 12px;
+    border:1px solid var(--line);
+    border-radius:9px;
+    outline:none;
+    background:#FEFDFB;
+  }
+  input:focus{ border-color:var(--spark); box-shadow:0 0 0 3px rgba(232,163,61,0.15); }
+  .toggle-eye{
+    position:absolute; right:10px; top:50%; transform:translateY(-50%);
+    cursor:pointer; background:none; border:none; color:var(--text-soft); font-size:12px;
+  }
+
+  .btn-submit{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:9px;
+    background:linear-gradient(135deg, #6B6FEE, #4FA8DA);
+    color:#fff;
+    font-weight:600;
+    font-size:14.5px;
+    cursor:pointer;
+    margin-top:6px;
+  }
+  .btn-submit:hover{ opacity:0.92; }
+  .btn-submit[disabled]{ opacity:0.6; cursor:not-allowed; }
+
+  .error-msg{
+    background:#FBEAE7; color:var(--out); border:1px solid #F1D3CC;
+    padding:10px 12px; border-radius:8px; font-size:13px; margin-bottom:18px; display:none;
+  }
+  .error-msg.show{ display:block; }
+
+  @media (max-width: 800px){
+    body{ flex-direction:column; }
+    .side{ padding:36px 26px; }
+    .side h1{ font-size:26px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="side">
+  <div class="brand">
+    <div class="brand-mark"></div>
+    <div style="font-weight:600; font-size:15px;">Murugan Crackers</div>
+  </div>
+  <h1>Run your whole store from one place.</h1>
+  <p>Your catalogue, orders and website — managed from a single dashboard, on any device.</p>
+
+  <div class="feature"><div class="dot">📦</div> Products & categories, kept in sync with your shop</div>
+  <div class="feature"><div class="dot">🧾</div> Orders and enquiries in one inbox</div>
+  <div class="feature"><div class="dot">💬</div> Contact messages, all in one place</div>
+</div>
+
+<div class="form-side">
+  <div class="form-wrap">
+    <h2>Welcome back</h2>
+    <p class="sub">Sign in to manage your store.</p>
+
+    <div class="error-msg" id="login-error"></div>
+
+    <form id="login-form">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="Your admin username" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <div class="input-wrap">
+          <input type="password" id="password" placeholder="Your password" autocomplete="current-password" required>
+          <button type="button" class="toggle-eye" onclick="togglePassword()">Show</button>
+        </div>
+      </div>
+      <button type="submit" class="btn-submit" id="login-submit">Sign in</button>
+    </form>
+  </div>
+</div>
+
+<script>
+/* Same Apps Script Web App URL as admin.html */
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby_niRA7802Ax6OfhRrcYWaLbkYA4gsQK7iyr_WipQmr9RoUE79IQ4bnVzn78ASijWk/exec";
+
+// Already logged in? Skip straight to admin.
+if (sessionStorage.getItem('admin_token')) {
+  window.location.href = 'admin.html';
+}
+
+function togglePassword(){
+  const input = document.getElementById('password');
+  const btn = document.querySelector('.toggle-eye');
+  if (input.type === 'password'){ input.type = 'text'; btn.textContent = 'Hide'; }
+  else { input.type = 'password'; btn.textContent = 'Show'; }
+}
+
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errorBox = document.getElementById('login-error');
+  const btn = document.getElementById('login-submit');
+  errorBox.className = 'error-msg';
+  errorBox.textContent = '';
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
+
+  try {
+    const body = new URLSearchParams({
+      action: 'adminLogin',
+      username: document.getElementById('username').value.trim(),
+      password: document.getElementById('password').value
+    });
+    const res = await fetch(WEB_APP_URL, { method: 'POST', body });
+    const data = await res.json();
+
+    if (!data.ok) throw new Error(data.error || 'Login failed');
+
+    sessionStorage.setItem('admin_token', data.token);
+    sessionStorage.setItem('admin_username', data.username);
+    window.location.href = 'admin.html';
+
+  } catch (err) {
+    errorBox.textContent = err.message;
+    errorBox.className = 'error-msg show';
+    btn.disabled = false;
+    btn.textContent = 'Sign in';
+  }
+});
+</script>
+
+</body>
+</html>

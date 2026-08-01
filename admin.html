@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Murugan Crackers — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     CONFIG — paste your Apps Script Web App URL below, then save.
+     Deploy > New deployment > Web app > Execute as: Me,
+     Who has access: Anyone. Copy the /exec URL into WEB_APP_URL
+     in the <script> block near the bottom of this file.
+     ============================================================ */
+
+  :root{
+    --ink:#1C1B1F;
+    --ink-soft:#2B292E;
+    --paper:#FBFAF7;
+    --card:#FFFFFF;
+    --line:#E9E5DC;
+    --spark:#E8A33D;
+    --spark-deep:#C1432E;
+    --live:#3F7D58;
+    --live-bg:#EAF3ED;
+    --out:#C1432E;
+    --out-bg:#FBEAE7;
+    --text:#242224;
+    --text-soft:#6B6560;
+    --radius:12px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--paper);
+    color:var(--text);
+    display:flex;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  ::selection{background:var(--spark); color:#1C1B1F;}
+
+  h1,h2,h3, .display{
+    font-family:'Space Grotesk',sans-serif;
+    letter-spacing:-0.01em;
+  }
+
+  .mono{ font-family:'JetBrains Mono', monospace; }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width:240px;
+    flex-shrink:0;
+    background:var(--ink);
+    color:#EFEDE8;
+    display:flex;
+    flex-direction:column;
+    padding:22px 16px;
+    position:sticky;
+    top:0;
+    height:100vh;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:4px 8px 22px 8px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    margin-bottom:16px;
+  }
+  .brand-mark{
+    width:34px; height:34px;
+    border-radius:9px;
+    background:radial-gradient(circle at 30% 30%, var(--spark), var(--spark-deep));
+    position:relative;
+    flex-shrink:0;
+  }
+  .brand-mark::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(255,255,255,0.9) 0 2px, transparent 2px),
+      repeating-conic-gradient(from 0deg, rgba(255,255,255,0.55) 0deg 4deg, transparent 4deg 45deg);
+    border-radius:9px;
+  }
+  .brand-text .name{ font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px; line-height:1.2;}
+  .brand-text .sub{ font-size:11px; color:#B7B2A9; letter-spacing:0.04em; text-transform:uppercase;}
+
+  nav{ display:flex; flex-direction:column; gap:2px; flex:1; }
+  .nav-item{
+    display:flex; align-items:center; gap:11px;
+    padding:10px 12px;
+    border-radius:9px;
+    color:#C9C4BB;
+    font-size:14px;
+    font-weight:500;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+    user-select:none;
+  }
+  .nav-item svg{ width:17px; height:17px; flex-shrink:0; opacity:0.85; }
+  .nav-item:hover{ background:rgba(255,255,255,0.06); color:#fff; }
+  .nav-item.active{ background:rgba(232,163,61,0.14); color:var(--spark); }
+  .nav-item.active svg{ opacity:1; }
+
+  .sidebar-foot{
+    font-size:11px; color:#79746C; padding:10px 8px 2px 8px;
+    border-top:1px solid rgba(255,255,255,0.08); margin-top:10px;
+  }
+
+  /* ---------- Main ---------- */
+  main{ flex:1; min-width:0; padding:32px 40px 60px 40px; }
+  .topbar{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:26px; flex-wrap:wrap; gap:10px;}
+  .topbar h1{ font-size:24px; margin:0 0 4px 0; font-weight:600; }
+  .topbar p{ margin:0; color:var(--text-soft); font-size:13.5px; }
+
+  .page{ display:none; }
+  .page.active{ display:block; animation:rise .25s ease; }
+  @keyframes rise{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  /* ---------- Cards / grid ---------- */
+  .stat-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:14px; margin-bottom:28px; }
+  .stat-card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 18px 16px 18px;
+  }
+  .stat-card .label{ font-size:12px; color:var(--text-soft); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;}
+  .stat-card .value{ font-family:'Space Grotesk',sans-serif; font-size:28px; font-weight:600; }
+  .stat-card .value.spark{ color:var(--spark-deep); }
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:22px; margin-bottom:22px;
+  }
+  .card h2{ font-size:16px; margin:0 0 16px 0; font-weight:600; }
+  .card h2 .count{ color:var(--text-soft); font-weight:500; font-size:13px; margin-left:6px; }
+
+  /* ---------- Forms ---------- */
+  .form-grid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:14px; }
+  .form-grid.full{ grid-template-columns:1fr; }
+  .field{ display:flex; flex-direction:column; gap:6px; }
+  .field.span2{ grid-column:1 / -1; }
+  label{ font-size:12.5px; font-weight:600; color:var(--text-soft); }
+  input, select{
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    padding:9px 11px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#FEFDFB;
+    color:var(--text);
+    outline:none;
+  }
+  input:focus, select:focus{ border-color:var(--spark); box-shadow:0 0 0 3px rgba(232,163,61,0.15); }
+
+  .btn{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    padding:10px 18px;
+    border-radius:8px;
+    border:none;
+    cursor:pointer;
+    display:inline-flex; align-items:center; gap:7px;
+    transition:transform .1s ease, opacity .15s ease;
+  }
+  .btn:active{ transform:scale(0.98); }
+  .btn-primary{ background:var(--ink); color:#fff; }
+  .btn-primary:hover{ background:var(--ink-soft); }
+  .btn-ghost{ background:transparent; color:var(--text-soft); border:1px solid var(--line); }
+  .btn-ghost:hover{ border-color:#C9C4BB; color:var(--text); }
+  .btn-danger{ background:var(--out-bg); color:var(--out); }
+  .btn-danger:hover{ opacity:0.8; }
+  .btn[disabled]{ opacity:0.5; cursor:not-allowed; }
+  .btn-row{ margin-top:16px; display:flex; gap:10px; align-items:center; }
+
+  /* ---------- Table ---------- */
+  table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  thead th{
+    text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:0.04em;
+    color:var(--text-soft); font-weight:600; padding:9px 10px; border-bottom:1px solid var(--line);
+  }
+  tbody td{ padding:11px 10px; border-bottom:1px solid var(--line); vertical-align:middle; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:#FAF8F3; }
+  .cell-name{ font-weight:600; }
+  .cell-muted{ color:var(--text-soft); }
+  .table-wrap{ overflow-x:auto; }
+
+  .pill{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:99px; font-size:12px; font-weight:600; }
+  .pill::before{ content:""; width:6px; height:6px; border-radius:50%; }
+  .pill.live{ background:var(--live-bg); color:var(--live); }
+  .pill.live::before{ background:var(--live); }
+  .pill.out{ background:var(--out-bg); color:var(--out); }
+  .pill.out::before{ background:var(--out); }
+
+  .icon-btn{
+    border:none; background:transparent; cursor:pointer; padding:5px 7px; border-radius:6px; color:var(--text-soft);
+    font-size:12px; font-weight:600;
+  }
+  .icon-btn:hover{ background:#F1EEE7; color:var(--text); }
+  .icon-btn.danger:hover{ background:var(--out-bg); color:var(--out); }
+
+  .empty{ padding:26px 10px; text-align:center; color:var(--text-soft); font-size:13.5px; }
+
+  .toast{
+    position:fixed; bottom:22px; right:22px; background:var(--ink); color:#fff;
+    padding:12px 18px; border-radius:9px; font-size:13.5px; font-weight:500;
+    box-shadow:0 8px 24px rgba(0,0,0,0.2);
+    opacity:0; transform:translateY(8px); transition:opacity .2s ease, transform .2s ease;
+    pointer-events:none; z-index:50;
+  }
+  .toast.show{ opacity:1; transform:translateY(0); }
+  .toast.error{ background:var(--out); }
+
+  .badge-warn{
+    background:#FBEAE7; color:var(--out); border:1px solid #F1D3CC;
+    padding:10px 14px; border-radius:9px; font-size:13px; margin-bottom:18px;
+  }
+
+  .pdf-link-box{
+    display:flex; align-items:center; gap:10px; padding:12px 14px; border:1px dashed var(--line);
+    border-radius:9px; background:#FEFDFB; font-size:13.5px; word-break:break-all;
+  }
+
+  /* ---------- Filter bar ---------- */
+  .filter-bar{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; align-items:center; }
+  .filter-bar select{ min-width:150px; }
+  .filter-bar .filter-label{ font-size:12px; color:var(--text-soft); font-weight:600; text-transform:uppercase; letter-spacing:0.04em; }
+  .filter-clear{ font-size:12.5px; color:var(--spark-deep); cursor:pointer; font-weight:600; background:none; border:none; padding:4px 6px; }
+  .filter-clear:hover{ text-decoration:underline; }
+
+  /* ---------- Image upload widget ---------- */
+  .image-upload{ display:flex; gap:14px; align-items:flex-start; }
+  .image-preview{
+    width:64px; height:64px; border-radius:9px; border:1px solid var(--line); background:#F4F1EA;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden;
+  }
+  .image-preview img{ width:100%; height:100%; object-fit:cover; }
+  .image-preview .placeholder{ font-size:10px; color:var(--text-soft); text-align:center; padding:4px; }
+  .image-upload-controls{ flex:1; display:flex; flex-direction:column; gap:8px; }
+  .file-btn{
+    display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600;
+    padding:8px 14px; border-radius:8px; border:1px solid var(--line); background:#FEFDFB;
+    cursor:pointer; width:fit-content; color:var(--text);
+  }
+  .file-btn:hover{ border-color:#C9C4BB; }
+  .file-btn input[type=file]{ display:none; }
+  .upload-status{ font-size:12px; color:var(--text-soft); }
+  .upload-status.uploading{ color:var(--spark-deep); }
+  .upload-status.done{ color:var(--live); }
+  .manual-link-toggle{ font-size:12px; color:var(--text-soft); cursor:pointer; text-decoration:underline; width:fit-content; }
+
+  /* ---------- Modal ---------- */
+  .modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(28,27,31,0.5);
+    align-items:center; justify-content:center; z-index:100; padding:20px;
+  }
+  .modal-overlay.show{ display:flex; }
+  .modal{
+    background:var(--card); border-radius:14px; width:100%; max-width:560px;
+    max-height:90vh; overflow-y:auto; box-shadow:0 20px 50px rgba(0,0,0,0.25);
+  }
+  .modal-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 22px; border-bottom:1px solid var(--line);
+  }
+  .modal-head h3{ margin:0; font-size:17px; font-weight:600; }
+  .modal-close{ background:none; border:none; font-size:22px; line-height:1; cursor:pointer; color:var(--text-soft); padding:2px 6px; }
+  .modal-close:hover{ color:var(--text); }
+  .modal-body{ padding:22px; }
+
+  @media (max-width: 760px){
+    body{ flex-direction:column; }
+    .sidebar{ width:100%; height:auto; position:relative; flex-direction:row; overflow-x:auto; }
+    .brand{ display:none; }
+    nav{ flex-direction:row; }
+    main{ padding:22px; }
+    .form-grid{ grid-template-columns:1fr; }
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-mark"></div>
+    <div class="brand-text">
+      <div class="name">Murugan Crackers</div>
+      <div class="sub">Admin</div>
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-item active" data-page="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" data-page="products">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7 12 3 4 7v10l8 4 8-4V7Z"/><path d="M4 7l8 4 8-4M12 11v10"/></svg>
+      Products
+    </div>
+    <div class="nav-item" data-page="categories">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
+      Categories
+    </div>
+    <div class="nav-item" data-page="pdf">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6Z"/><path d="M15 2v5h5"/><path d="M9 13h6M9 17h6"/></svg>
+      Price List PDF
+    </div>
+    <div class="nav-item" data-page="orders">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v4H4Z"/><path d="M4 8v12h16V8"/><path d="M9 12h6"/></svg>
+      Orders
+    </div>
+    <div class="nav-item" data-page="contacts">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>
+      Messages
+    </div>
+    <!-- ============ NEW: Admin Users nav item ============ -->
+    <div class="nav-item" data-page="users">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Admin Users
+    </div>
+  </nav>
+
+  <div class="sidebar-foot" style="display:flex; flex-direction:column; gap:8px;">
+    <span id="sidebar-username">Connected store admin</span>
+    <button class="btn btn-ghost" style="padding:6px 10px; font-size:12px;" onclick="logout()">Log out</button>
+  </div>
+
+</aside>
+
+<main>
+
+  <!-- ============ DASHBOARD ============ -->
+  <section class="page active" id="page-dashboard">
+    <div class="topbar">
+      <div>
+        <h1>Dashboard</h1>
+        <p>A quick look at your store, right now.</p>
+      </div>
+      <button class="btn btn-ghost" onclick="loadDashboard()">Refresh</button>
+    </div>
+
+    <div id="dashboard-warn"></div>
+
+    <div class="stat-grid" id="dashboard-stats">
+      <div class="stat-card"><div class="label">Products</div><div class="value">—</div></div>
+      <div class="stat-card"><div class="label">Live</div><div class="value">—</div></div>
+      <div class="stat-card"><div class="label">Out of stock</div><div class="value">—</div></div>
+      <div class="stat-card"><div class="label">Categories</div><div class="value">—</div></div>
+      <div class="stat-card"><div class="label">Orders</div><div class="value">—</div></div>
+      <div class="stat-card"><div class="label">Revenue</div><div class="value spark">—</div></div>
+    </div>
+
+    <div class="card">
+      <h2>Get around the admin</h2>
+      <p style="color:var(--text-soft); font-size:13.5px; margin:0 0 4px 0;">
+        Add a product and it appears on your shop page automatically. Same for categories and the price list PDF —
+        no more opening the spreadsheet by hand.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ PRODUCTS ============ -->
+  <section class="page" id="page-products">
+    <div class="topbar">
+      <div>
+        <h1>Products</h1>
+        <p>Add a new product or manage what's already listed.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Add a product</h2>
+      <form id="product-form">
+        <div class="form-grid">
+          <div class="field">
+            <label>Product name</label>
+            <input type="text" id="p-name" placeholder="e.g. Sky Shot Rocket" required>
+          </div>
+          <div class="field">
+            <label>Category</label>
+            <select id="p-category" required></select>
+          </div>
+          <div class="field">
+            <label>Price (₹)</label>
+            <input type="number" id="p-price" min="0" step="0.01" placeholder="150" required>
+          </div>
+          <div class="field">
+            <label>Stock status</label>
+            <select id="p-status">
+              <option value="Live">Live</option>
+              <option value="Out of Stock">Out of Stock</option>
+            </select>
+          </div>
+          <div class="field span2">
+            <label>Product photo</label>
+            <div class="image-upload">
+              <div class="image-preview" id="p-image-preview"><span class="placeholder">No photo</span></div>
+              <div class="image-upload-controls">
+                <label class="file-btn">
+                  Choose photo
+                  <input type="file" id="p-image-file" accept="image/*">
+                </label>
+                <span class="upload-status" id="p-image-status">JPG, PNG, WEBP or GIF, up to 4 MB. Uploaded straight to Drive.</span>
+                <span class="manual-link-toggle" id="p-manual-toggle" onclick="toggleManualLink('p')">or paste an image link instead</span>
+                <input type="text" id="p-image" placeholder="https://drive.google.com/file/d/.../view?usp=sharing" style="display:none;">
+              </div>
+            </div>
+          </div>
+          <div class="field span2">
+            <label>Video link (optional — YouTube or Google Drive)</label>
+            <input type="text" id="p-video" placeholder="https://www.youtube.com/watch?v=...">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="submit" class="btn btn-primary" id="p-submit">Add product</button>
+          <span id="p-status-msg" style="font-size:13px; color:var(--text-soft);"></span>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>All products <span class="count" id="products-count"></span></h2>
+
+      <div class="filter-bar">
+        <span class="filter-label">Filter</span>
+        <select id="filter-category" onchange="applyProductFilters()">
+          <option value="">All categories</option>
+        </select>
+        <select id="filter-status" onchange="applyProductFilters()">
+          <option value="">All statuses</option>
+          <option value="Live">Live</option>
+          <option value="Out of Stock">Out of Stock</option>
+        </select>
+        <button class="filter-clear" onclick="clearProductFilters()">Clear filters</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Name</th><th>Category</th><th>Price</th><th>Status</th><th>Video</th><th></th></tr>
+          </thead>
+          <tbody id="products-tbody">
+            <tr><td colspan="7" class="empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CATEGORIES ============ -->
+  <section class="page" id="page-categories">
+    <div class="topbar">
+      <div>
+        <h1>Categories</h1>
+        <p>Group products and set a discount that applies to everything inside.</p>
+      </div>
+      <button class="btn btn-ghost" onclick="exportCategoriesPDF()">Export to PDF</button>
+    </div>
+
+    <div class="card">
+      <h2>Add a category</h2>
+      <form id="category-form">
+        <div class="form-grid">
+          <div class="field">
+            <label>Category name</label>
+            <input type="text" id="c-name" placeholder="e.g. Flower Pots" required>
+          </div>
+          <div class="field">
+            <label>Discount (%)</label>
+            <input type="number" id="c-discount" min="0" max="100" step="1" placeholder="60" required>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="submit" class="btn btn-primary" id="c-submit">Add category</button>
+          <span id="c-status-msg" style="font-size:13px; color:var(--text-soft);"></span>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>All categories <span class="count" id="categories-count"></span></h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Name</th><th>Discount</th><th></th></tr></thead>
+          <tbody id="categories-tbody">
+            <tr><td colspan="4" class="empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRICE LIST PDF ============ -->
+  <section class="page" id="page-pdf">
+    <div class="topbar">
+      <div>
+        <h1>Price List PDF</h1>
+        <p>Paste a Google Drive share link to the PDF customers can download.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Current PDF</h2>
+      <div id="pdf-current" class="pdf-link-box">Loading…</div>
+    </div>
+
+    <div class="card">
+      <h2>Update PDF link</h2>
+      <form id="pdf-form">
+        <div class="form-grid full">
+          <div class="field">
+            <label>Google Drive share link</label>
+            <input type="text" id="pdf-link" placeholder="https://drive.google.com/file/d/.../view?usp=sharing" required>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="submit" class="btn btn-primary" id="pdf-submit">Save PDF link</button>
+          <span id="pdf-status-msg" style="font-size:13px; color:var(--text-soft);"></span>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ ORDERS ============ -->
+  <section class="page" id="page-orders">
+    <div class="topbar">
+      <div>
+        <h1>Orders</h1>
+        <p>Every order placed on the storefront, newest first.</p>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-ghost" onclick="loadOrders()">Refresh</button>
+        <button class="btn btn-ghost" onclick="exportOrdersPDF()">Export to PDF</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>All orders <span class="count" id="orders-count"></span></h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Customer</th><th>Contact</th><th>Address</th><th>Products</th><th>Total</th></tr>
+          </thead>
+          <tbody id="orders-tbody">
+            <tr><td colspan="6" class="empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT MESSAGES ============ -->
+  <section class="page" id="page-contacts">
+   <div class="topbar">
+      <div>
+        <h1>Contact Messages</h1>
+        <p>Messages submitted through the "Contact Us" form on your website.</p>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-ghost" onclick="loadContacts()">Refresh</button>
+        <button class="btn btn-ghost" onclick="exportContactsPDF()">Export to PDF</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>All messages <span class="count" id="contacts-count"></span></h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Name</th><th>Email</th><th>Phone</th><th>Message</th></tr>
+          </thead>
+          <tbody id="contacts-tbody">
+            <tr><td colspan="5" class="empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ NEW: ADMIN USERS ============ -->
+  <!-- Manages the "User Details" sheet (Username | Password) so more than
+       one person can log into this admin panel. -->
+  <section class="page" id="page-users">
+    <div class="topbar">
+      <div>
+        <h1>Admin Users</h1>
+        <p>Add or remove people who are allowed to log into this admin panel.</p>
+      </div>
+      <button class="btn btn-ghost" onclick="loadUsers()">Refresh</button>
+    </div>
+
+    <div class="card">
+      <h2>Add a user</h2>
+      <form id="user-form">
+        <div class="form-grid">
+          <div class="field">
+            <label>Username</label>
+            <input type="text" id="u-username" placeholder="e.g. priya" required>
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input type="text" id="u-password" placeholder="Choose a password" required>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="submit" class="btn btn-primary" id="u-submit">Add user</button>
+          <span id="u-status-msg" style="font-size:13px; color:var(--text-soft);"></span>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>All admin users <span class="count" id="users-count"></span></h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Username</th><th></th></tr></thead>
+          <tbody id="users-tbody">
+            <tr><td colspan="2" class="empty">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modal-title">Edit</h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modal-body"><!-- injected form goes here --></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+  /* ---------------- auth guard ---------------- */
+if (!sessionStorage.getItem('admin_token')) {
+  window.location.href = 'login.html';
+}
+
+function getToken(){ return sessionStorage.getItem('admin_token'); }
+
+function logout(){
+  sessionStorage.removeItem('admin_token');
+  sessionStorage.removeItem('admin_username');
+  window.location.href = 'login.html';
+}
+
+/* ================================================================
+   CONFIG — paste your Apps Script Web App URL here (ends in /exec)
+   ================================================================ */
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby_niRA7802Ax6OfhRrcYWaLbkYA4gsQK7iyr_WipQmr9RoUE79IQ4bnVzn78ASijWk/exec";
+
+/* ---------------- helpers ---------------- */
+
+function showToast(msg, isError){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(()=> t.className = 'toast', 2200);
+}
+
+function configured(){
+  if (!WEB_APP_URL || WEB_APP_URL.indexOf('PASTE_YOUR') === 0){
+    showToast('Set WEB_APP_URL in admin.html first', true);
+    return false;
+  }
+  return true;
+}
+
+async function apiGet(action, params){
+  const url = new URL(WEB_APP_URL);
+  url.searchParams.set('action', action);
+  url.searchParams.set('token', getToken() || '');
+  if (params) Object.keys(params).forEach(k => url.searchParams.set(k, params[k]));
+  const res = await fetch(url.toString());
+  const data = await res.json();
+  if (!data.ok) {
+    if ((data.error || '').indexOf('Unauthorized') === 0) { logout(); }
+    throw new Error(data.error || 'Request failed');
+  }
+  return data;
+}
+
+async function apiPost(action, params){
+  const body = new URLSearchParams({ action, token: getToken() || '', ...params });
+  const res = await fetch(WEB_APP_URL, { method: 'POST', body });
+  const data = await res.json();
+  if (!data.ok) {
+    if ((data.error || '').indexOf('Unauthorized') === 0) { logout(); }
+    throw new Error(data.error || 'Request failed');
+  }
+  return data;
+}
+
+
+function escapeHtml(s){
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function money(n){
+  const num = Number(String(n).replace(/[₹,]/g,'')) || 0;
+  return '₹' + num.toLocaleString('en-IN');
+}
+
+/* ---------------- modal ---------------- */
+
+function openModal(){ document.getElementById('modal-overlay').classList.add('show'); }
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('show');
+  document.getElementById('modal-body').innerHTML = '';
+}
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+/* ---------------- image upload widget ---------------- */
+
+function driveThumb(link){
+  const m = String(link || '').match(/\/d\/([a-zA-Z0-9_-]+)/) || String(link || '').match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  return m ? `https://drive.google.com/thumbnail?id=${m[1]}` : link;
+}
+
+function toggleManualLink(prefix){
+  const input = document.getElementById(prefix + '-image');
+  input.style.display = input.style.display === 'none' ? 'block' : 'none';
+  if (input.style.display === 'block') input.focus();
+}
+
+function attachImageUploader(prefix){
+  const fileInput = document.getElementById(prefix + '-image-file');
+  if (!fileInput) return;
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    if (!configured()) return;
+
+    const statusEl = document.getElementById(prefix + '-image-status');
+    const previewEl = document.getElementById(prefix + '-image-preview');
+    const hiddenInput = document.getElementById(prefix + '-image');
+
+    if (file.size > 4 * 1024 * 1024){
+      showToast('Photo is over 4 MB — pick a smaller one', true);
+      fileInput.value = '';
+      return;
+    }
+
+    statusEl.textContent = 'Uploading to Drive…';
+    statusEl.className = 'upload-status uploading';
+
+    try{
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const result = await apiPost('uploadProductImage', {
+        imageData: dataUrl,
+        imageName: file.name,
+        imageType: file.type || 'image/jpeg'
+      });
+
+      hiddenInput.value = result.driveUrl;
+      previewEl.innerHTML = `<img src="${result.thumbnailUrl}">`;
+      statusEl.textContent = 'Uploaded ✓';
+      statusEl.className = 'upload-status done';
+    } catch(err){
+      statusEl.textContent = 'Upload failed — try again';
+      statusEl.className = 'upload-status';
+      showToast(err.message, true);
+    }
+  });
+}
+
+function resetImageWidget(prefix){
+  const previewEl = document.getElementById(prefix + '-image-preview');
+  const statusEl = document.getElementById(prefix + '-image-status');
+  const hiddenInput = document.getElementById(prefix + '-image');
+  if (previewEl) previewEl.innerHTML = '<span class="placeholder">No photo</span>';
+  if (statusEl){ statusEl.textContent = 'JPG, PNG, WEBP or GIF, up to 4 MB. Uploaded straight to Drive.'; statusEl.className = 'upload-status'; }
+  if (hiddenInput) hiddenInput.value = '';
+}
+
+/* ---------------- navigation ---------------- */
+
+const pages = ['dashboard','products','categories','pdf','orders','contacts','users'];
+
+function goTo(page){
+  pages.forEach(p => {
+    document.getElementById('page-'+p).classList.toggle('active', p === page);
+  });
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.page === page);
+  });
+  if (page === 'dashboard') loadDashboard();
+  if (page === 'products') loadProducts();
+  if (page === 'categories') loadCategories();
+  if (page === 'pdf') loadPdf();
+  if (page === 'orders') loadOrders();
+  if (page === 'contacts') loadContacts();
+  if (page === 'users') loadUsers();
+}
+
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => goTo(el.dataset.page));
+});
+
+/* ---------------- dashboard ---------------- */
+
+async function loadDashboard(){
+  if (!configured()) return;
+  try{
+    const { productCount, liveCount, outCount, categoryCount, orderCount, totalRevenue } = await apiGet('dashboardSummary');
+    const grid = document.getElementById('dashboard-stats');
+    grid.innerHTML = `
+      <div class="stat-card"><div class="label">Products</div><div class="value">${productCount}</div></div>
+      <div class="stat-card"><div class="label">Live</div><div class="value">${liveCount}</div></div>
+      <div class="stat-card"><div class="label">Out of stock</div><div class="value">${outCount}</div></div>
+      <div class="stat-card"><div class="label">Categories</div><div class="value">${categoryCount}</div></div>
+      <div class="stat-card"><div class="label">Orders</div><div class="value">${orderCount}</div></div>
+      <div class="stat-card"><div class="label">Revenue</div><div class="value spark">${money(totalRevenue)}</div></div>
+    `;
+  } catch(err){
+    showToast(err.message, true);
+  }
+}
+
+/* ---------------- products ---------------- */
+
+let categoriesCache = [];
+let productsCache = [];
+let ordersCache = [];
+let contactsCache = [];
+let usersCache = [];
+
+async function loadProducts(){
+  if (!configured()) return;
+  const tbody = document.getElementById('products-tbody');
+  tbody.innerHTML = '<tr><td colspan="7" class="empty">Loading…</td></tr>';
+  try{
+    const [{ categories }, { products }] = await Promise.all([
+      apiGet('listCategories'),
+      apiGet('listProducts')
+    ]);
+    categoriesCache = categories;
+    productsCache = products;
+
+    fillCategorySelect(categories, 'p-category');
+    fillFilterCategorySelect(categories);
+
+    renderProductsTable(applyFiltersToList(products));
+  } catch(err){
+    tbody.innerHTML = '<tr><td colspan="7" class="empty">Could not load products.</td></tr>';
+    showToast(err.message, true);
+  }
+}
+
+function catName(id){
+  return (categoriesCache.find(c => String(c.id) === String(id)) || {}).name || '—';
+}
+
+function renderProductsTable(products){
+  const tbody = document.getElementById('products-tbody');
+  document.getElementById('products-count').textContent = '(' + products.length + (products.length !== productsCache.length ? ' of ' + productsCache.length : '') + ')';
+
+  if (!products.length){
+    tbody.innerHTML = '<tr><td colspan="7" class="empty">No products match this filter.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = products.map(p => `
+    <tr>
+      <td class="mono cell-muted">${escapeHtml(p.id)}</td>
+      <td class="cell-name">${escapeHtml(p.name)}</td>
+      <td>${escapeHtml(catName(p.category_id))}</td>
+      <td class="mono">${money(p.price)}</td>
+      <td>
+        <span class="pill ${p.status === 'Live' ? 'live' : 'out'}">${escapeHtml(p.status)}</span>
+      </td>
+      <td class="cell-muted">${p.video ? 'Yes' : '—'}</td>
+      <td style="white-space:nowrap;">
+        <button class="icon-btn" onclick="openEditProduct('${p.id}')">Edit</button>
+        <button class="icon-btn" onclick="toggleProductStatus('${p.id}','${p.status}')">
+          ${p.status === 'Live' ? 'Mark out' : 'Mark live'}
+        </button>
+        <button class="icon-btn danger" onclick="removeProduct('${p.id}','${escapeHtml(p.name)}')">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function fillCategorySelect(categories, selectId){
+  const sel = document.getElementById(selectId);
+  if (!categories.length){
+    sel.innerHTML = '<option value="">Add a category first</option>';
+    return;
+  }
+  sel.innerHTML = categories.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+}
+
+function fillFilterCategorySelect(categories){
+  const sel = document.getElementById('filter-category');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">All categories</option>' +
+    categories.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+  sel.value = current;
+}
+
+function applyFiltersToList(products){
+  const catFilter = document.getElementById('filter-category').value;
+  const statusFilter = document.getElementById('filter-status').value;
+  return products.filter(p =>
+    (!catFilter || String(p.category_id) === String(catFilter)) &&
+    (!statusFilter || p.status === statusFilter)
+  );
+}
+
+function applyProductFilters(){
+  renderProductsTable(applyFiltersToList(productsCache));
+}
+
+function clearProductFilters(){
+  document.getElementById('filter-category').value = '';
+  document.getElementById('filter-status').value = '';
+  applyProductFilters();
+}
+
+/* -- add product -- */
+
+document.getElementById('product-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!configured()) return;
+  const btn = document.getElementById('p-submit');
+  const msg = document.getElementById('p-status-msg');
+  btn.disabled = true; msg.textContent = 'Saving…';
+  try{
+    await apiPost('addProduct', {
+      name: document.getElementById('p-name').value.trim(),
+      category_id: document.getElementById('p-category').value,
+      price: document.getElementById('p-price').value,
+      status: document.getElementById('p-status').value,
+      image: document.getElementById('p-image').value.trim(),
+      video: document.getElementById('p-video').value.trim()
+    });
+    e.target.reset();
+    resetImageWidget('p');
+    msg.textContent = 'Added ✓';
+    showToast('Product added — it will now show on the shop page');
+    loadProducts();
+    loadDashboard();
+  } catch(err){
+    msg.textContent = '';
+    showToast(err.message, true);
+  } finally {
+    btn.disabled = false;
+    setTimeout(()=> msg.textContent = '', 2000);
+  }
+});
+
+async function toggleProductStatus(id, currentStatus){
+  const next = currentStatus === 'Live' ? 'Out of Stock' : 'Live';
+  try{
+    await apiPost('updateProductStatus', { id, status: next });
+    showToast('Status updated');
+    loadProducts();
+    loadDashboard();
+  } catch(err){
+    showToast(err.message, true);
+  }
+}
+
+async function removeProduct(id, name){
+  if (!confirm(`Delete "${name}"? This can't be undone.`)) return;
+  try{
+    await apiPost('deleteProduct', { id });
+    showToast('Product deleted');
+    loadProducts();
+    loadDashboard();
+  } catch(err){
+    showToast(err.message, true);
+  }
+}
+
+/* -- edit product (modal) -- */
+
+function openEditProduct(id){
+  const p = productsCache.find(x => String(x.id) === String(id));
+  if (!p) return;
+
+  document.getElementById('modal-title').textContent = 'Edit product';
+  document.getElementById('modal-body').innerHTML = `
+    <form id="edit-product-form">
+      <div class="form-grid">
+        <div class="field">
+          <label>Product name</label>
+          <input type="text" id="ep-name" value="${escapeHtml(p.name)}" required>
+        </div>
+        <div class="field">
+          <label>Category</label>
+          <select id="ep-category" required></select>
+        </div>
+        <div class="field">
+          <label>Price (₹)</label>
+          <input type="number" id="ep-price" min="0" step="0.01" value="${p.price}" required>
+        </div>
+        <div class="field">
+          <label>Stock status</label>
+          <select id="ep-status">
+            <option value="Live">Live</option>
+            <option value="Out of Stock">Out of Stock</option>
+          </select>
+        </div>
+        <div class="field span2">
+          <label>Product photo</label>
+          <div class="image-upload">
+            <div class="image-preview" id="ep-image-preview">
+              ${p.image ? `<img src="${escapeHtml(driveThumb(p.image))}" onerror="this.parentElement.innerHTML='<span class=placeholder>No preview</span>'">` : '<span class="placeholder">No photo</span>'}
+            </div>
+            <div class="image-upload-controls">
+              <label class="file-btn">
+                Choose new photo
+                <input type="file" id="ep-image-file" accept="image/*">
+              </label>
+              <span class="upload-status" id="ep-image-status">Leave blank to keep the current photo.</span>
+              <span class="manual-link-toggle" id="ep-manual-toggle" onclick="toggleManualLink('ep')">or paste an image link instead</span>
+              <input type="text" id="ep-image" value="${escapeHtml(p.image || '')}" style="display:none;">
+            </div>
+          </div>
+        </div>
+        <div class="field span2">
+          <label>Video link (optional)</label>
+          <input type="text" id="ep-video" value="${escapeHtml(p.video || '')}">
+        </div>
+      </div>
+      <input type="hidden" id="ep-id" value="${escapeHtml(p.id)}">
+      <div class="btn-row">
+        <button type="submit" class="btn btn-primary" id="ep-submit">Save changes</button>
+        <span id="ep-status-msg" style="font-size:13px; color:var(--text-soft);"></span>
+      </div>
+    </form>
+  `;
+
+  fillCategorySelect(categoriesCache, 'ep-category');
+  document.getElementById('ep-category').value = p.category_id;
+  document.getElementById('ep-status').value = p.status;
+
+  attachImageUploader('ep');
+
+  document.getElementById('edit-product-form').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const btn = document.getElementById('ep-submit');
+    const msg = document.getElementById('ep-status-msg');
+    btn.disabled = true; msg.textContent = 'Saving…';
+    try{
+      await apiPost('updateProduct', {
+        id: document.getElementById('ep-id').value,
+        name: document.getElementById('ep-name').value.trim(),
+        category_id: document.getElementById('ep-category').value,
+        price: document.getElementById('ep-price').value,
+        status: document.getElementById('ep-status').value,
+        image: document.getElementById('ep-image').value.trim(),
+        video: document.getElementById('ep-video').value.trim()
+      });
+      showToast('Product updated');
+      closeModal();
+      loadProducts();
+      loadDashboard();
+    } catch(err){
+      msg.textContent = '';
+      showToast(err.message, true);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  openModal();
+}
+
+/* ---------------- categories ---------------- */
+
+async function loadCategories(){
+  if (!configured()) return;
+  const tbody = document.getElementById('categories-tbody');
+  tbody.innerHTML = '<tr><td colspan="4" class="empty">Loading…</td></tr>';
+  try{
+    const { categories } = await apiGet('listCategories');
+    categoriesCache = categories;
+    document.getElementById('categories-count').textContent = '(' + categories.length + ')';
+    if (!categories.length){
+      tbody.innerHTML = '<tr><td colspan="4" class="empty">No categories yet — add your first one above.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = categories.map(c => `
+      <tr>
+        <td class="mono cell-muted">${escapeHtml(c.id)}</td>
+        <td class="cell-name">${escapeHtml(c.name)}</td>
+        <td class="mono">${c.discount}%</td>
+        <td style="white-space:nowrap;">
+          <button class="icon-btn" onclick="openEditCategory('${c.id}')">Edit</button>
+          <button class="icon-btn danger" onclick="removeCategory('${c.id}','${escapeHtml(c.name)}')">Delete</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch(err){
+    tbody.innerHTML = '<tr><td colspan="4" class="empty">Could not load categories.</td></tr>';
+    showToast(err.message, true);
+  }
+}
+
+function openEditCategory(id){
+  const c = categoriesCache.find(x => String(x.id) === String(id));
+  if (!c) return;
+
+  document.getElementById('modal-title').textContent = 'Edit category';
+  document.getElementById('modal-body').innerHTML = `
+    <form id="edit-category-form">
+      <div class="form-grid">
+        <div class="field">
+          <label>Category name</label>
+          <input type="text" id="ec-name" value="${escapeHtml(c.name)}" required>
+        </div>
+        <div class="field">
+          <label>Discount (%)</label>
+          <input type="number" id="ec-discount" min="0" max="100" step="1" value="${c.discount}" required>
+        </div>
+      </div>
+      <input type="hidden" id="ec-id" value="${escapeHtml(c.id)}">
+      <div class="btn-row">
+        <button type="submit" class="btn btn-primary" id="ec-submit">Save changes</button>
+        <span id="ec-status-msg" style="font-size:13px; color:var(--text-soft);"></span>
+      </div>
+    </form>
+  `;
+
+  document.getElementById('edit-category-form').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const btn = document.getElementById('ec-submit');
+    const msg = document.getElementById('ec-status-msg');
+    btn.disabled = true; msg.textContent = 'Saving…';
+    try{
+      await apiPost('updateCategory', {
+        id: document.getElementById('ec-id').value,
+        name: document.getElementById('ec-name').value.trim(),
+        discount: document.getElementById('ec-discount').value
+      });
+      showToast('Category updated');
+      closeModal();
+      loadCategories();
+      loadProducts();
+      loadDashboard();
+    } catch(err){
+      msg.textContent = '';
+      showToast(err.message, true);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  openModal();
+}
+
+document.getElementById('category-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!configured()) return;
+  const btn = document.getElementById('c-submit');
+  const msg = document.getElementById('c-status-msg');
+  btn.disabled = true; msg.textContent = 'Saving…';
+  try{
+    await apiPost('addCategory', {
+      name: document.getElementById('c-name').value.trim(),
+      discount: document.getElementById('c-discount').value
+    });
+    e.target.reset();
+    msg.textContent = 'Added ✓';
+    showToast('Category added');
+    loadCategories();
+    loadDashboard();
+  } catch(err){
+    msg.textContent = '';
+    showToast(err.message, true);
+  } finally {
+    btn.disabled = false;
+    setTimeout(()=> msg.textContent = '', 2000);
+  }
+});
+
+async function removeCategory(id, name){
+  if (!confirm(`Delete category "${name}"? Products already in it will keep their old discount until reassigned.`)) return;
+  try{
+    await apiPost('deleteCategory', { id });
+    showToast('Category deleted');
+    loadCategories();
+    loadDashboard();
+  } catch(err){
+    showToast(err.message, true);
+  }
+}
+
+/* ---------------- PDF ---------------- */
+
+async function loadPdf(){
+  if (!configured()) return;
+  const box = document.getElementById('pdf-current');
+  box.textContent = 'Loading…';
+  try{
+    const { url } = await apiGet('getPriceListPdf');
+    if (url){
+      box.innerHTML = `<a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(url)}</a>`;
+    } else {
+      box.textContent = 'No PDF set yet.';
+    }
+  } catch(err){
+    box.textContent = 'Could not load current PDF.';
+    showToast(err.message, true);
+  }
+}
+
+document.getElementById('pdf-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!configured()) return;
+  const btn = document.getElementById('pdf-submit');
+  const msg = document.getElementById('pdf-status-msg');
+  btn.disabled = true; msg.textContent = 'Saving…';
+  try{
+    await apiPost('setPriceListPdf', { link: document.getElementById('pdf-link').value.trim() });
+    msg.textContent = 'Saved ✓';
+    showToast('Price list PDF updated');
+    loadPdf();
+  } catch(err){
+    msg.textContent = '';
+    showToast(err.message, true);
+  } finally {
+    btn.disabled = false;
+    setTimeout(()=> msg.textContent = '', 2000);
+  }
+});
+
+/* ---------------- orders ---------------- */
+
+async function loadOrders(){
+  if (!configured()) return;
+  const tbody = document.getElementById('orders-tbody');
+  tbody.innerHTML = '<tr><td colspan="6" class="empty">Loading…</td></tr>';
+  try{
+   const { orders } = await apiGet('listOrders');
+    ordersCache = orders;
+    document.getElementById('orders-count').textContent = '(' + orders.length + ')';
+    if (!orders.length){
+      tbody.innerHTML = '<tr><td colspan="6" class="empty">No orders yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = orders.map(o => `
+      <tr>
+        <td class="cell-muted">${o.date ? new Date(o.date).toLocaleString('en-IN') : '—'}</td>
+        <td>
+          <div class="cell-name">${escapeHtml(o.name)}</div>
+          <div class="cell-muted" style="font-size:12px;">${escapeHtml(o.email)}</div>
+        </td>
+        <td class="cell-muted">${escapeHtml(o.phone)}</td>
+        <td class="cell-muted" style="max-width:220px;">${escapeHtml(o.address)}, ${escapeHtml(o.city)} ${escapeHtml(o.pincode)}</td>
+        <td style="max-width:260px; white-space:pre-line;">${escapeHtml(o.products)}</td>
+        <td class="mono cell-name">${money(o.grandTotal)}</td>
+      </tr>
+    `).join('');
+  } catch(err){
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">Could not load orders.</td></tr>';
+    showToast(err.message, true);
+  }
+}
+
+/* ---------------- contact messages ---------------- */
+
+async function loadContacts(){
+  if (!configured()) return;
+  const tbody = document.getElementById('contacts-tbody');
+  tbody.innerHTML = '<tr><td colspan="5" class="empty">Loading…</td></tr>';
+  try{
+    const { contacts } = await apiGet('listContacts');
+    contactsCache = contacts;
+    document.getElementById('contacts-count').textContent = '(' + contacts.length + ')';
+    if (!contacts.length){
+      tbody.innerHTML = '<tr><td colspan="5" class="empty">No messages yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = contacts.map(m => `
+      <tr>
+        <td class="cell-muted">${m.date ? new Date(m.date).toLocaleString('en-IN') : '—'}</td>
+        <td class="cell-name">${escapeHtml(m.name)}</td>
+        <td class="cell-muted">${escapeHtml(m.email)}</td>
+        <td class="cell-muted">${escapeHtml(m.phone)}</td>
+        <td style="max-width:320px; white-space:pre-line;">${escapeHtml(m.message)}</td>
+      </tr>
+    `).join('');
+  } catch(err){
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">Could not load messages.</td></tr>';
+    showToast(err.message, true);
+  }
+}
+
+/* ---------------- NEW: admin users ---------------- */
+
+async function loadUsers(){
+  if (!configured()) return;
+  const tbody = document.getElementById('users-tbody');
+  tbody.innerHTML = '<tr><td colspan="2" class="empty">Loading…</td></tr>';
+  try{
+    const { users } = await apiGet('listUsers');
+    usersCache = users;
+    document.getElementById('users-count').textContent = '(' + users.length + ')';
+    if (!users.length){
+      tbody.innerHTML = '<tr><td colspan="2" class="empty">No users found.</td></tr>';
+      return;
+    }
+    const myUsername = (sessionStorage.getItem('admin_username') || '').toLowerCase();
+    tbody.innerHTML = users.map(u => `
+      <tr>
+        <td class="cell-name">${escapeHtml(u.username)}${String(u.username).toLowerCase() === myUsername ? ' <span class="cell-muted">(you)</span>' : ''}</td>
+        <td style="white-space:nowrap;">
+          <button class="icon-btn danger" onclick="removeUser('${escapeHtml(u.username)}')">Delete</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch(err){
+    tbody.innerHTML = '<tr><td colspan="2" class="empty">Could not load users.</td></tr>';
+    showToast(err.message, true);
+  }
+}
+
+document.getElementById('user-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!configured()) return;
+  const btn = document.getElementById('u-submit');
+  const msg = document.getElementById('u-status-msg');
+  btn.disabled = true; msg.textContent = 'Saving…';
+  try{
+    await apiPost('addUser', {
+      username: document.getElementById('u-username').value.trim(),
+      password: document.getElementById('u-password').value
+    });
+    e.target.reset();
+    msg.textContent = 'Added ✓';
+    showToast('User added — they can log in now');
+    loadUsers();
+  } catch(err){
+    msg.textContent = '';
+    showToast(err.message, true);
+  } finally {
+    btn.disabled = false;
+    setTimeout(()=> msg.textContent = '', 2000);
+  }
+});
+
+async function removeUser(username){
+  if (!confirm(`Delete user "${username}"? They won't be able to log in anymore.`)) return;
+  try{
+    await apiPost('deleteUser', { username });
+    showToast('User deleted');
+    loadUsers();
+  } catch(err){
+    showToast(err.message, true);
+  }
+}
+
+/* ---------------- PDF export ---------------- */
+
+function pdfHeader(doc, title){
+  doc.setFontSize(16);
+  doc.text('Murugan Crackers - ' + title, 14, 16);
+  doc.setFontSize(10);
+  doc.setTextColor(120);
+  doc.text('Exported: ' + new Date().toLocaleString('en-IN'), 14, 22);
+  doc.setTextColor(0);
+}
+
+function exportCategoriesPDF(){
+  if (!categoriesCache.length){ showToast('No categories to export', true); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  pdfHeader(doc, 'Categories');
+  doc.autoTable({
+    startY: 28,
+    head: [['ID', 'Name', 'Discount']],
+    body: categoriesCache.map(c => [c.id, c.name, c.discount + '%'])
+  });
+  doc.save('categories-' + Date.now() + '.pdf');
+}
+
+function exportOrdersPDF(){
+  if (!ordersCache.length){ showToast('No orders to export', true); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape' });
+  pdfHeader(doc, 'Orders');
+  doc.autoTable({
+    startY: 28,
+    head: [['Date', 'Customer', 'Email', 'Phone', 'Address', 'Products', 'Total']],
+    body: ordersCache.map(o => [
+      o.date ? new Date(o.date).toLocaleString('en-IN') : '—',
+      o.name,
+      o.email,
+      o.phone,
+      `${o.address}, ${o.city} ${o.pincode}`,
+      o.products,
+      money(o.grandTotal)
+    ]),
+    styles: { fontSize: 8 },
+    columnStyles: { 5: { cellWidth: 70 } }
+  });
+  doc.save('orders-' + Date.now() + '.pdf');
+}
+
+function exportContactsPDF(){
+  if (!contactsCache.length){ showToast('No messages to export', true); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  pdfHeader(doc, 'Contact Messages');
+  doc.autoTable({
+    startY: 28,
+    head: [['Date', 'Name', 'Email', 'Phone', 'Message']],
+    body: contactsCache.map(m => [
+      m.date ? new Date(m.date).toLocaleString('en-IN') : '—',
+      m.name,
+      m.email,
+      m.phone,
+      m.message
+    ]),
+    styles: { fontSize: 9 }
+  });
+  doc.save('messages-' + Date.now() + '.pdf');
+}
+
+/* ---------------- init ---------------- */
+
+const savedUser = sessionStorage.getItem('admin_username');
+if (savedUser) document.getElementById('sidebar-username').textContent = savedUser;
+
+attachImageUploader('p');
+loadDashboard();
+</script>
+
+</body>
+</html>

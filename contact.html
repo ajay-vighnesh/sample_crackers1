@@ -291,6 +291,13 @@
   // ── Contact form URL (your existing one) ────────────────────────────────
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby_s8ayQLda-8Kzunwqu8OnPXBnvzLVAXesaVCqNIlT3wTAg4N3CvfDJe6qX9t_ILcB/exec";
 
+  // ─────────────────────────────────────────────────────────────────────
+  // NEW: WhatsApp number the contact form should message after saving.
+  // Use the full number with country code and NO spaces, +, or dashes.
+  // Example: for +91 94433 28086 → "919443328086"
+  // ─────────────────────────────────────────────────────────────────────
+  const WHATSAPP_NUMBER = "919487028086"; // ← same number used in shop.html
+
 
   // ── Contact form submit ─────────────────────────────────────────────────
   function sendMessage() {
@@ -310,16 +317,44 @@
     formData.append("phone", phone);
     formData.append("message", message);
 
+    const submitBtn = document.getElementById("submitBtn");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending…";
+
     fetch(SCRIPT_URL, { method: "POST", body: formData })
       .then(response => response.text())
       .then(result => {
-        alert(result);
         document.getElementById("customerForm").reset();
+
+        // NEW: after the message is saved, hand off to WhatsApp with the
+        // same details, pre-filled, so the customer just has to hit send.
+        openContactOnWhatsApp({ name, email, phone, message });
       })
       .catch(error => {
         console.error(error);
         alert("Failed to send message.");
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Send Message";
       });
+  }
+
+  // NEW: builds a wa.me link pre-filled with the customer's enquiry and
+  // opens it in a new tab — mirrors the enquiry flow used on shop.html.
+  function openContactOnWhatsApp({ name, email, phone, message }) {
+    const lines = [
+      "🧨 *New Enquiry — Crackers shop name*",
+      "",
+      `*Name:* ${name}`,
+      `*Email:* ${email}`,
+      `*Phone:* ${phone}`,
+      `*Message:* ${message}`
+    ];
+
+    const text = lines.join("\n");
+    const waUrl = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(text);
+    window.open(waUrl, "_blank");
   }
 
 
