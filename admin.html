@@ -274,13 +274,94 @@
   .modal-close:hover{ color:var(--text); }
   .modal-body{ padding:22px; }
 
+  /* ---------- Bottom nav (mobile) ---------- */
+  /* NOTE: explicitly reset flex-direction/gap/flex here because the generic
+     `nav{ flex-direction:column }` rule above (written for the desktop
+     sidebar) also matches this <nav> element — a class selector only
+     overrides the properties it actually declares, not every property
+     from a lower-specificity tag selector. Without this reset the bar
+     stacks into a tall vertical block instead of a slim horizontal strip. */
+  .bottom-nav{
+    display:none;
+    flex-direction:row;
+    flex:none;
+    gap:0;
+  }
+  .more-sheet-overlay{ display:none; }
+
   @media (max-width: 760px){
     body{ flex-direction:column; }
-    .sidebar{ width:100%; height:auto; position:relative; flex-direction:row; overflow-x:auto; }
-    .brand{ display:none; }
-    nav{ flex-direction:row; }
-    main{ padding:22px; }
+
+    /* Sidebar is replaced entirely by the bottom nav on mobile */
+    .sidebar{ display:none; }
+
+    main{ padding:18px 16px calc(88px + env(safe-area-inset-bottom)) 16px; }
     .form-grid{ grid-template-columns:1fr; }
+    .topbar h1{ font-size:21px; }
+
+    /* Fixed bottom tab bar */
+    .bottom-nav{
+      display:flex;
+      flex-direction:row;
+      flex:none;
+      gap:0;
+      position:fixed;
+      left:0; right:0; bottom:0;
+      background:var(--ink);
+      z-index:60;
+      padding:6px 2px calc(6px + env(safe-area-inset-bottom)) 2px;
+      box-shadow:0 -4px 20px rgba(0,0,0,0.18);
+    }
+    .bottom-nav-item{
+      flex:1;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:3px;
+      padding:6px 2px 5px 2px;
+      background:none; border:none;
+      color:#B7B2A9;
+      font-family:'Inter', sans-serif;
+      font-size:10.5px;
+      font-weight:600;
+      cursor:pointer;
+      user-select:none;
+      border-radius:10px;
+    }
+    .bottom-nav-item svg{ width:20px; height:20px; opacity:0.9; }
+    .bottom-nav-item.active{ color:var(--spark); }
+    .bottom-nav-item.active svg{ opacity:1; }
+    .bottom-nav-item:active{ background:rgba(255,255,255,0.06); }
+
+    /* "More" bottom sheet, for the nav items that don't fit in the bar */
+    .more-sheet-overlay{
+      display:block;
+      position:fixed; inset:0;
+      background:rgba(28,27,31,0.5);
+      z-index:70;
+      opacity:0; pointer-events:none;
+      transition:opacity .2s ease;
+    }
+    .more-sheet-overlay.show{ opacity:1; pointer-events:auto; }
+    .more-sheet{
+      position:fixed; left:0; right:0; bottom:0;
+      background:var(--card);
+      border-radius:16px 16px 0 0;
+      padding:10px 10px calc(16px + env(safe-area-inset-bottom)) 10px;
+      transform:translateY(100%);
+      transition:transform .25s ease;
+    }
+    .more-sheet-overlay.show .more-sheet{ transform:translateY(0); }
+    .more-sheet-handle{ width:36px; height:4px; background:var(--line); border-radius:99px; margin:6px auto 12px auto; }
+    .more-sheet-item{
+      display:flex; align-items:center; gap:13px;
+      padding:13px 12px;
+      border-radius:10px;
+      font-size:14.5px; font-weight:500; color:var(--text);
+      cursor:pointer;
+    }
+    .more-sheet-item svg{ width:19px; height:19px; color:var(--text-soft); flex-shrink:0; }
+    .more-sheet-item:active{ background:#F1EEE7; }
+    .more-sheet-item.danger{ color:var(--out); border-top:1px solid var(--line); margin-top:4px; padding-top:16px; }
+    .more-sheet-item.danger svg{ color:var(--out); }
   }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -335,6 +416,52 @@
   </div>
 
 </aside>
+
+<!-- ============ Mobile bottom tab bar ============ -->
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="bottom-nav-item active" data-page="dashboard" onclick="goTo('dashboard')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+    Home
+  </button>
+  <button class="bottom-nav-item" data-page="products" onclick="goTo('products')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7 12 3 4 7v10l8 4 8-4V7Z"/><path d="M4 7l8 4 8-4M12 11v10"/></svg>
+    Products
+  </button>
+  <button class="bottom-nav-item" data-page="orders" onclick="goTo('orders')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v4H4Z"/><path d="M4 8v12h16V8"/><path d="M9 12h6"/></svg>
+    Orders
+  </button>
+  <button class="bottom-nav-item" data-page="categories" onclick="goTo('categories')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
+    Categories
+  </button>
+  <button class="bottom-nav-item" id="more-nav-btn" onclick="openMoreSheet()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
+    Menu
+  </button>
+</nav>
+
+<div class="more-sheet-overlay" id="more-sheet-overlay" onclick="if(event.target===this) closeMoreSheet()">
+  <div class="more-sheet">
+    <div class="more-sheet-handle"></div>
+    <div class="more-sheet-item" onclick="closeMoreSheet(); goTo('pdf')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6Z"/><path d="M15 2v5h5"/><path d="M9 13h6M9 17h6"/></svg>
+      Price List PDF
+    </div>
+    <div class="more-sheet-item" onclick="closeMoreSheet(); goTo('contacts')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>
+      Messages
+    </div>
+    <div class="more-sheet-item" onclick="closeMoreSheet(); goTo('users')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Admin Users
+    </div>
+    <div class="more-sheet-item danger" onclick="logout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      Log out
+    </div>
+  </div>
+</div>
 
 <main>
 
@@ -806,6 +933,14 @@ function goTo(page){
   document.querySelectorAll('.nav-item').forEach(el => {
     el.classList.toggle('active', el.dataset.page === page);
   });
+
+  // keep the mobile bottom tab bar in sync
+  document.querySelectorAll('.bottom-nav-item[data-page]').forEach(el => {
+    el.classList.toggle('active', el.dataset.page === page);
+  });
+  const moreBtn = document.getElementById('more-nav-btn');
+  if (moreBtn) moreBtn.classList.toggle('active', ['pdf','contacts','users'].includes(page));
+
   if (page === 'dashboard') loadDashboard();
   if (page === 'products') loadProducts();
   if (page === 'categories') loadCategories();
@@ -813,11 +948,19 @@ function goTo(page){
   if (page === 'orders') loadOrders();
   if (page === 'contacts') loadContacts();
   if (page === 'users') loadUsers();
+
+  window.scrollTo(0, 0);
 }
 
 document.querySelectorAll('.nav-item').forEach(el => {
   el.addEventListener('click', () => goTo(el.dataset.page));
 });
+
+/* ---------------- mobile "more" sheet ---------------- */
+
+function openMoreSheet(){ document.getElementById('more-sheet-overlay').classList.add('show'); }
+function closeMoreSheet(){ document.getElementById('more-sheet-overlay').classList.remove('show'); }
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMoreSheet(); });
 
 /* ---------------- dashboard ---------------- */
 
