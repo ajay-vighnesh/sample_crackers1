@@ -16,6 +16,31 @@
 
 <body>
 
+  <!-- ================================================
+     CASE 2: WHATSAPP FLOATING BUTTON
+     Change the number below (91XXXXXXXXXX)
+================================================ -->
+<a id="whatsappBtn"
+   href="https://wa.me/9487028086?text=Hi%2C%20I%20am%20interested%20in%20buying%20crackers%20from%20Sri%20Lakshmi%20Pyro%20Tech.%20Please%20share%20the%20price%20list."
+   target="_blank"
+   title="Chat on WhatsApp">
+  <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16 .5C7.44.5.5 7.44.5 16c0 2.83.74 5.49 2.03 7.8L.5 31.5l7.93-2.07A15.44 15.44 0 0016 31.5c8.56 0 15.5-6.94 15.5-15.5S24.56.5 16 .5zm0 28.3a12.73 12.73 0 01-6.5-1.78l-.47-.28-4.7 1.23 1.25-4.58-.31-.49A12.73 12.73 0 1116 28.8zm7-9.45c-.38-.19-2.26-1.12-2.61-1.24-.35-.13-.6-.19-.86.19-.25.38-.98 1.24-1.2 1.5-.22.25-.44.28-.82.09-.38-.19-1.6-.59-3.05-1.88-1.13-1-1.89-2.24-2.11-2.62-.22-.38-.02-.58.17-.77.17-.17.38-.44.57-.66.19-.22.25-.38.38-.63.13-.25.06-.47-.03-.66-.09-.19-.86-2.07-1.18-2.83-.31-.74-.63-.64-.86-.65h-.73c-.25 0-.66.09-1 .47-.35.38-1.32 1.29-1.32 3.14s1.35 3.64 1.54 3.89c.19.25 2.66 4.06 6.44 5.69.9.39 1.6.62 2.15.79.9.29 1.73.25 2.38.15.73-.11 2.26-.92 2.58-1.81.32-.89.32-1.65.22-1.81-.09-.16-.35-.25-.73-.44z"/>
+  </svg>
+</a>
+
+
+<!-- ================================================
+     CASE 5: CALL FLOATING BUTTON
+     Change the number below (+91XXXXXXXXXX)
+================================================ -->
+<a id="callBtn"
+   href="tel:+919487028086"
+   title="Call Us">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6.62 10.79a15.09 15.09 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.55.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.49a1 1 0 011 1 11.36 11.36 0 00.57 3.55 1 1 0 01-.25 1.01l-2.2 2.23z"/>
+  </svg>
+</a>
 
     <div id="marqueeBar">
   <div class="marquee-track">
@@ -38,7 +63,7 @@
                     <nav class="navbar navbar-expand-lg navbar-light">
                         <a class="navbar-brand" href="home.html">
                             <!-- <img src="img/LP_CMYK.png" alt="logo" style="height:88px;"> -->
-                            <img src="img/footer-logo.png" alt="logo" style="height:88px;">
+                            <img src="img/LP_CMYK.png" alt="logo" style="height:88px;">
           
 
                         </a>
@@ -212,7 +237,7 @@
     <!-- Col 1: Company Info -->
     <div style="flex:1; min-width:200px;">
       <!-- <img src="img/LP_CMYK.png" style="height:60px; margin-bottom:12px; filter:brightness(0) invert(1);"> -->
-      <img src="img/footer-logo.png" style="height:60px; margin-bottom:12px; filter:brightness(0) invert(1);">
+      <img src="img/LP_CMYK.png" style="height:60px; margin-bottom:12px; filter:brightness(0) invert(1);">
 
       <h4 style="color:#fff; font-size:18px; font-weight:700; margin-bottom:10px; border-bottom:2px solid #fff; padding-bottom:6px;">csrackers shop name</h4>
       <p style="font-size:13px; line-height:1.8; color:#f5f5f5;">
@@ -438,6 +463,33 @@
 
     <style>
 
+
+ /* ================================================
+       CASE 5 — CALL FLOATING BUTTON
+    ================================================ */
+    #callBtn {
+      position: fixed;
+      bottom: 92px;
+      left: 20px;
+      z-index: 9997;
+      width: 56px;
+      height: 56px;
+      background: #b71c1c;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      text-decoration: none;
+      transition: transform 0.2s;
+    }
+    #callBtn:hover { transform: scale(1.1); }
+    #callBtn svg {
+      width: 26px;
+      height: 26px;
+      fill: #fff;
+    }
+
           /* ================================================
        CASE 3 — TOP MARQUEE RUNNING TEXT BAR
     ================================================ */
@@ -485,6 +537,33 @@
         .gmap_canvas {
             overflow: hidden;
         }
+
+          /* ================================================
+       CASE 2 — WHATSAPP FLOATING BUTTON
+    ================================================ */
+    #whatsappBtn {
+      position: fixed;
+      bottom: 24px;
+      left: 20px;
+      z-index: 9997;
+      width: 56px;
+      height: 56px;
+      background: #25D366;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      text-decoration: none;
+      transition: transform 0.2s;
+    }
+    #whatsappBtn:hover { transform: scale(1.1); }
+    #whatsappBtn svg {
+      width: 32px;
+      height: 32px;
+      fill: #fff;
+    }
+
     </style>
 
 </body>
