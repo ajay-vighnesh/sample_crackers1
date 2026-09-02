@@ -150,12 +150,12 @@
 </div>
 
 <script>
-/* Same Apps Script Web App URL as admin.html */
+/* Same Apps Script Web App URL as /admin */
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby_niRA7802Ax6OfhRrcYWaLbkYA4gsQK7iyr_WipQmr9RoUE79IQ4bnVzn78ASijWk/exec";
 
 // Already logged in? Skip straight to admin.
 if (sessionStorage.getItem('admin_token')) {
-  window.location.href = 'admin.html';
+  window.location.href = '/admin';
 }
 
 function togglePassword(){
@@ -187,7 +187,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 
     sessionStorage.setItem('admin_token', data.token);
     sessionStorage.setItem('admin_username', data.username);
-    window.location.href = 'admin.html';
+    window.location.href = '/admin';
 
   } catch (err) {
     errorBox.textContent = err.message;

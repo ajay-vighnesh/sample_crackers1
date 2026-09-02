@@ -776,7 +776,7 @@
 
   /* ---------------- auth guard ---------------- */
 if (!sessionStorage.getItem('admin_token')) {
-  window.location.href = 'login.html';
+  window.location.href = '/login';
 }
 
 function getToken(){ return sessionStorage.getItem('admin_token'); }
@@ -784,7 +784,7 @@ function getToken(){ return sessionStorage.getItem('admin_token'); }
 function logout(){
   sessionStorage.removeItem('admin_token');
   sessionStorage.removeItem('admin_username');
-  window.location.href = 'login.html';
+  window.location.href = '/login';
 }
 
 /* ================================================================
