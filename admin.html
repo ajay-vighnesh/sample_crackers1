@@ -7,6 +7,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
+  /* PREMIUM MARQUEE FONT */
+#marqueeBar {
+    font-family: 'Poppins', sans-serif;
+}
+
+#marqueeBar .marquee-track {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+#marqueeBar .highlight {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+}
+
   /* ============================================================
      CONFIG — paste your Apps Script Web App URL below, then save.
      Deploy > New deployment > Web app > Execute as: Me,
@@ -227,6 +244,30 @@
     border-radius:9px; background:#FEFDFB; font-size:13.5px; word-break:break-all;
   }
 
+  /* ---------- PDF product import ---------- */
+  .pdf-import-drop{
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+    padding:16px; border:1px dashed var(--line); border-radius:10px; background:#FEFDFB;
+    flex-wrap:wrap;
+  }
+  .pdf-import-info{ flex:1; min-width:220px; }
+  .pdf-import-title{ font-weight:600; font-size:14px; margin-bottom:4px; }
+  .pdf-import-help{ font-size:12.5px; color:var(--text-soft); line-height:1.5; }
+  .pdf-import-file{
+    display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600;
+    padding:9px 14px; border-radius:8px; border:1px solid var(--line); background:#fff;
+    cursor:pointer; color:var(--text); white-space:nowrap;
+  }
+  .pdf-import-file:hover{ border-color:#C9C4BB; }
+  .pdf-import-file input{ display:none; }
+  .pdf-import-status{ margin-top:12px; font-size:12.5px; color:var(--text-soft); }
+  .pdf-import-status.success{ color:var(--live); }
+  .pdf-import-status.error{ color:var(--out); }
+  .pdf-import-preview{ margin-top:14px; max-height:300px; overflow:auto; border:1px solid var(--line); border-radius:9px; display:none; }
+  .pdf-import-preview table{ min-width:620px; }
+  .pdf-import-preview th{ position:sticky; top:0; background:#F8F5EE; z-index:1; }
+  .pdf-import-actions{ margin-top:12px; display:none; gap:10px; align-items:center; flex-wrap:wrap; }
+
   /* ---------- Filter bar ---------- */
   .filter-bar{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; align-items:center; }
   .filter-bar select{ min-width:150px; }
@@ -363,17 +404,136 @@
     .more-sheet-item.danger{ color:var(--out); border-top:1px solid var(--line); margin-top:4px; padding-top:16px; }
     .more-sheet-item.danger svg{ color:var(--out); }
   }
+
+  /* ============================================================
+     NEW: DIRECT PRICE LIST PDF UPLOAD
+     Existing manual Google Drive link UI is hidden, not deleted.
+     ============================================================ */
+
+  /* Hide only the old manual-link card without changing its HTML. */
+  #page-pdf .card:has(#pdf-form){
+    display:none !important;
+  }
+
+  .price-pdf-upload{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+
+  .price-pdf-drop{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:18px;
+    border:1px dashed var(--line);
+    border-radius:10px;
+    background:#FEFDFB;
+    flex-wrap:wrap;
+  }
+
+  .price-pdf-info{
+    flex:1;
+    min-width:220px;
+  }
+
+  .price-pdf-title{
+    font-weight:600;
+    font-size:14px;
+    margin-bottom:5px;
+  }
+
+  .price-pdf-help{
+    font-size:12.5px;
+    color:var(--text-soft);
+    line-height:1.5;
+  }
+
+  .price-pdf-file-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    font-size:13px;
+    font-weight:600;
+    padding:10px 15px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:#fff;
+    cursor:pointer;
+    color:var(--text);
+    white-space:nowrap;
+  }
+
+  .price-pdf-file-btn:hover{
+    border-color:#C9C4BB;
+  }
+
+  .price-pdf-file-btn input{
+    display:none;
+  }
+
+  .price-pdf-selected{
+    display:none;
+    padding:11px 13px;
+    border-radius:8px;
+    background:#F8F5EE;
+    color:var(--text);
+    font-size:12.5px;
+    word-break:break-word;
+  }
+
+  .price-pdf-status{
+    font-size:12.5px;
+    color:var(--text-soft);
+  }
+
+  .price-pdf-status.uploading{
+    color:var(--spark-deep);
+  }
+
+  .price-pdf-status.success{
+    color:var(--live);
+  }
+
+  .price-pdf-status.error{
+    color:var(--out);
+  }
+
+  .price-pdf-progress{
+    display:none;
+    height:5px;
+    background:#EEEAE2;
+    border-radius:99px;
+    overflow:hidden;
+  }
+
+  .price-pdf-progress-bar{
+    width:0%;
+    height:100%;
+    background:var(--spark-deep);
+    transition:width .2s ease;
+  }
+
+  .price-pdf-reset{
+    display:none;
+    width:fit-content;
+  }
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 
 <aside class="sidebar">
   <div class="brand">
-    <div class="brand-mark"></div>
+    <!-- <div class="brand-mark"></div> -->
     <div class="brand-text">
-      <div class="name">Murugan Crackers</div>
+            <img src="img/chitra_crackers_logo.png" style="height:60px">
+
+      <div class="name">Chitra Crackers</div>
       <div class="sub">Admin</div>
     </div>
   </div>
@@ -504,8 +664,7 @@
       </div>
     </div>
 
-
-      <div class="card">
+    <div class="card">
       <h2>Import products from price list PDF</h2>
       <div class="pdf-import-drop">
         <div class="pdf-import-info">
@@ -676,6 +835,71 @@
         </div>
       </form>
     </div>
+
+    <!-- ==========================================================
+         NEW: DIRECT PRICE LIST PDF UPLOAD
+         The old manual Google Drive link card is hidden by CSS.
+         ========================================================== -->
+    <div class="card">
+      <h2>Upload Price List PDF</h2>
+
+      <div class="price-pdf-upload">
+
+        <div class="price-pdf-drop">
+
+          <div class="price-pdf-info">
+            <div class="price-pdf-title">
+              Upload your price-list PDF directly
+            </div>
+
+            <div class="price-pdf-help">
+              Choose a PDF from your computer. It will automatically
+              upload to Google Drive and become the new customer
+              download PDF. No Google Drive link needs to be pasted.
+            </div>
+          </div>
+
+          <label class="price-pdf-file-btn">
+            📄 Choose PDF
+            <input
+              type="file"
+              id="price-list-pdf-file"
+              accept="application/pdf,.pdf"
+            >
+          </label>
+
+        </div>
+
+        <div
+          id="price-list-pdf-selected"
+          class="price-pdf-selected">
+        </div>
+
+        <div
+          id="price-list-pdf-progress"
+          class="price-pdf-progress">
+          <div
+            id="price-list-pdf-progress-bar"
+            class="price-pdf-progress-bar">
+          </div>
+        </div>
+
+        <div
+          id="price-list-pdf-status"
+          class="price-pdf-status">
+          No PDF selected.
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-ghost price-pdf-reset"
+          id="price-list-pdf-reset">
+          Choose another PDF
+        </button>
+
+      </div>
+    </div>
+
   </section>
 
   <!-- ============ ORDERS ============ -->
@@ -797,7 +1021,7 @@
 
   /* ---------------- auth guard ---------------- */
 if (!sessionStorage.getItem('admin_token')) {
-  window.location.href = '/login';
+  window.location.href = 'login.html';
 }
 
 function getToken(){ return sessionStorage.getItem('admin_token'); }
@@ -805,13 +1029,13 @@ function getToken(){ return sessionStorage.getItem('admin_token'); }
 function logout(){
   sessionStorage.removeItem('admin_token');
   sessionStorage.removeItem('admin_username');
-  window.location.href = '/login';
+  window.location.href = 'login.html';
 }
 
 /* ================================================================
    CONFIG — paste your Apps Script Web App URL here (ends in /exec)
    ================================================================ */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby_niRA7802Ax6OfhRrcYWaLbkYA4gsQK7iyr_WipQmr9RoUE79IQ4bnVzn78ASijWk/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyW94AcYVLROI9t6o_9kxVTWSwmofaY8coniZLOAEAXWTS1k79NLM9u4x-5Zx8rfk6SJg/exec";
 
 /* ---------------- helpers ---------------- */
 
@@ -943,7 +1167,515 @@ function resetImageWidget(prefix){
   if (hiddenInput) hiddenInput.value = '';
 }
 
+/* ---------------- PDF product importer ---------------- */
 
+let parsedPdfProducts = [];
+let pdfImportBusy = false;
+
+function setPdfImportStatus(message, type){
+  const el = document.getElementById('pdf-import-status');
+  if (!el) return;
+  el.textContent = message;
+  el.className = 'pdf-import-status' + (type ? ' ' + type : '');
+}
+
+function normalisePdfText(value){
+  return String(value || '')
+    .replace(/[\u00A0\u2007\u202F]/g, ' ')
+    .replace(/[|¦]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function cleanPdfProductName(name){
+  return normalisePdfText(name)
+    .replace(/^\d+\s+/, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+function pdfNumber(value){
+  const cleaned = String(value || '')
+    .replace(/[₹Rs\.]/gi, '')
+    .replace(/,/g, '')
+    .replace(/[^0-9.\-]/g, '')
+    .trim();
+  if (!cleaned || !/^\d+(?:\.\d+)?$/.test(cleaned)) return null;
+  const n = Number(cleaned);
+  return Number.isFinite(n) ? n : null;
+}
+
+function isPdfNumberText(value){
+  return pdfNumber(value) !== null;
+}
+
+function isPdfSerialText(value){
+  return /^\d{1,4}$/.test(normalisePdfText(value));
+}
+
+function isPdfUnitText(value){
+  const v = normalisePdfText(value).toLowerCase().replace(/[^a-z]/g, '');
+  return /^(pkt|pkts|packet|packets|box|boxes|pcs|pc|piece|pieces|nos|no)$/.test(v);
+}
+
+function isPdfHeaderText(value){
+  const v = normalisePdfText(value).toLowerCase();
+  return /^(s\.?\s*no|sno|items?|name|product|products|cracker|crackers|per|qty|quantity|amount|actual|actual price|price|rate|discount|discount rate|offer|order|90%|80%|70%|60%|50%)$/i.test(v)
+    || /^(actual\s+price|discount\s+rate|offer\s+price|selling\s+price|unit\s+price|rate\s+per|price\s+per)$/i.test(v);
+}
+
+function isPdfCategoryCandidate(line){
+  const value = normalisePdfText(line);
+  if (!value || value.length < 2 || value.length > 80) return false;
+  if (/^(s\.?\s*no|name of the crackers|items?|per|actual|actual price|price|rate|discount|discount rate|offer|order|qty|quantity|amount)$/i.test(value)) return false;
+  if (/^\d+(?:\.\d+)?$/.test(value)) return false;
+  if (/^(1\s*)?(pkt|pkts|packet|packets|box|boxes|pcs?|pieces?)$/i.test(value)) return false;
+  if (/^(page|continued|total|grand total|date|contact|phone|mobile|email|website|address)/i.test(value)) return false;
+  return !/₹|\b(?:rs|inr)\.?\s*\d/i.test(value);
+}
+
+function pdfLineText(line){
+  return normalisePdfText((line.items || []).map(x => x.text).join(' '));
+}
+
+function pdfFindHeaderAnchors(lines){
+  const anchors = {
+    itemX: null,
+    priceX: null,
+    perX: null,
+    amountX: null,
+    qtyX: null,
+    snoX: null
+  };
+
+  const all = [];
+  for (const line of lines){
+    for (const item of (line.items || [])){
+      const text = normalisePdfText(item.text);
+      if (!text) continue;
+      all.push({ ...item, text, cx: item.x + (item.width || 0) / 2 });
+    }
+  }
+
+  const firstSerialY = (() => {
+    const serials = all.filter(x => isPdfSerialText(x.text));
+    return serials.length ? Math.max(...serials.map(x => x.y)) : -Infinity;
+  })();
+
+  // Headers are normally above the first numbered product row. We deliberately
+  // do not depend on font, colour, table borders, or exact wording.
+  const headerItems = all.filter(x => x.y >= firstSerialY - 80);
+
+  function firstAnchor(regex){
+    const hit = headerItems.find(x => regex.test(x.text.toLowerCase()));
+    return hit ? hit.cx : null;
+  }
+
+  anchors.snoX = firstAnchor(/^(s\.?\s*no|sno)$/i);
+  anchors.itemX = firstAnchor(/^(items?|product|products|name|cracker|crackers)$/i);
+  anchors.perX = firstAnchor(/^per$/i);
+  anchors.qtyX = firstAnchor(/^(qty|quantity)$/i);
+  anchors.amountX = firstAnchor(/^amount$/i);
+
+  // Prefer an explicit Actual Price / Selling Price / Unit Price column.
+  const explicitPrice = headerItems.find(x => /^(actual\s*price|selling\s*price|unit\s*price|price)$/i.test(x.text));
+  if (explicitPrice) anchors.priceX = explicitPrice.cx;
+
+  // Otherwise use Rate / Discount Rate / Offer Price / percentage rate.
+  if (anchors.priceX === null){
+    const rate = headerItems.find(x => /^(?:\d+%\s*)?(?:discount\s*)?rate$|^(?:\d+%\s*)?discount\s*rate$|^offer\s*price$|^rate$/i.test(x.text));
+    if (rate) anchors.priceX = rate.cx;
+  }
+
+  // If a percentage and "DISCOUNT RATE" are split into separate PDF text
+  // objects, use the second object as the price-column anchor.
+  if (anchors.priceX === null){
+    const discount = headerItems.find(x => /discount\s*rate/i.test(x.text));
+    if (discount) anchors.priceX = discount.cx;
+  }
+
+  return anchors;
+}
+
+function pdfFindPriceFromRow(items, anchors){
+  const numeric = items
+    .map((item, index) => ({ item, index, value: pdfNumber(item.text), cx: item.x + (item.width || 0) / 2 }))
+    .filter(x => x.value !== null);
+
+  if (!numeric.length) return null;
+
+  // Best case: a detected price/rate column. Pick the numeric value closest to
+  // that column, which works even when the PDF uses different fonts or spacing.
+  if (anchors.priceX !== null){
+    const candidates = numeric.filter(x => x.value > 0 && x.value < 10000000);
+    if (candidates.length){
+      candidates.sort((a,b) => Math.abs(a.cx - anchors.priceX) - Math.abs(b.cx - anchors.priceX));
+      return candidates[0];
+    }
+  }
+
+  // Fallback: use the unit column as a separator. Some PDFs put PRICE before
+  // PER (e.g. 12.00 | 1 PKT), while others put PER before PRICE.
+  const unitIndex = items.findIndex(x => isPdfUnitText(x.text));
+  if (unitIndex >= 0){
+    const before = numeric.filter(x => x.index < unitIndex && x.index > 0);
+    const after = numeric.filter(x => x.index > unitIndex);
+    if (before.length) return before[before.length - 1];
+    if (after.length) return after[0];
+  }
+
+  // Last resort: ignore the serial number and choose the first reasonable
+  // monetary-looking number, never relying on a fixed PDF column order.
+  return numeric.find(x => x.index > 0 && x.value > 0 && x.value < 10000000) || null;
+}
+
+function pdfFindProductName(items, anchors, priceInfo){
+  if (!items.length) return '';
+  const serialIndex = items.findIndex(x => isPdfSerialText(x.text));
+  const startIndex = serialIndex >= 0 ? serialIndex + 1 : 0;
+
+  const priceX = priceInfo ? priceInfo.cx : anchors.priceX;
+  const perX = anchors.perX;
+  const endX = priceX !== null ? priceX : (perX !== null ? perX : Infinity);
+
+  // If the PDF exposes an ITEMS/PRODUCT column, use its x-coordinate. This
+  // prevents Tamil/description columns from being accidentally added to the
+  // English product name.
+  if (anchors.itemX !== null){
+    const parts = items.filter((item, idx) => {
+      if (idx < startIndex) return false;
+      const text = normalisePdfText(item.text);
+      if (!text || isPdfNumberText(text) || isPdfUnitText(text)) return false;
+      const cx = item.x + (item.width || 0) / 2;
+      if (cx < anchors.itemX - 8) return false;
+      if (endX !== Infinity && cx > endX - 8) return false;
+      return true;
+    });
+    if (parts.length) return cleanPdfProductName(parts.map(x => x.text).join(' '));
+  }
+
+  // Generic fallback for PDFs with no recognizable ITEMS header.
+  const parts = [];
+  for (let i = startIndex; i < items.length; i++){
+    const text = normalisePdfText(items[i].text);
+    if (!text) continue;
+    if (isPdfNumberText(text) || isPdfUnitText(text)) break;
+    if (priceInfo && i >= priceInfo.index) break;
+    if (perX !== null){
+      const cx = items[i].x + (items[i].width || 0) / 2;
+      if (cx >= perX - 8) break;
+    }
+    if (!isPdfHeaderText(text)) parts.push(text);
+  }
+  return cleanPdfProductName(parts.join(' '));
+}
+
+function pdfLooksLikeRow(line){
+  return (line.items || []).some(item => isPdfSerialText(item.text));
+}
+
+function pdfLooksLikeHeader(line){
+  const t = pdfLineText(line).toLowerCase();
+  return /s\.?\s*no|items?|actual|price|rate|discount|offer|per|qty|quantity|amount/.test(t);
+}
+
+function dedupePdfProducts(products){
+  const seen = new Set();
+  return products.filter(p => {
+    const key = `${String(p.category).trim().toLowerCase()}|${String(p.name).trim().toLowerCase()}|${Number(p.price)}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function parsePdfPages(pages){
+  const products = [];
+  let currentCategory = '';
+
+  for (const page of pages){
+    const lines = page.lines || [];
+    const anchors = pdfFindHeaderAnchors(lines);
+
+    for (let i = 0; i < lines.length; i++){
+      const line = lines[i];
+      const text = pdfLineText(line);
+      if (!text) continue;
+      if (pdfLooksLikeHeader(line)) continue;
+
+      if (pdfLooksLikeRow(line)){
+        const serialItem = (line.items || []).find(item => isPdfSerialText(item.text));
+        if (!serialItem) continue;
+        const serial = normalisePdfText(serialItem.text);
+        const priceInfo = pdfFindPriceFromRow(line.items, anchors);
+        if (!priceInfo || priceInfo.value <= 0) continue;
+
+        const name = pdfFindProductName(line.items, anchors, priceInfo);
+        if (!name || name.length < 2) continue;
+
+        products.push({
+          serial,
+          name,
+          category: currentCategory || 'Imported Products',
+          price: Math.round(priceInfo.value * 100) / 100
+        });
+        continue;
+      }
+
+      // Category headings are detected dynamically as standalone text rows.
+      // We confirm that a numbered product row appears shortly afterwards so
+      // page titles/addresses are not mistaken for categories.
+      if (isPdfCategoryCandidate(text)){
+        const nearbyRows = lines.slice(i + 1, i + 5).some(pdfLooksLikeRow);
+        if (nearbyRows) currentCategory = text;
+      }
+    }
+  }
+
+  return dedupePdfProducts(products);
+}
+
+async function extractPdfPages(file){
+  if (!window.pdfjsLib) throw new Error('PDF reader library is not loaded. Refresh the page and try again.');
+  const buffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({data: buffer}).promise;
+  const pages = [];
+
+  for (let pageNo = 1; pageNo <= pdf.numPages; pageNo++){
+    const page = await pdf.getPage(pageNo);
+    const content = await page.getTextContent({ disableCombineTextItems: false });
+    const rawItems = content.items
+      .filter(item => normalisePdfText(item.str))
+      .map(item => ({
+        text: normalisePdfText(item.str),
+        x: Number(item.transform[4]) || 0,
+        y: Number(item.transform[5]) || 0,
+        width: Number(item.width) || 0,
+        height: Math.abs(Number(item.height || item.transform[3])) || 8
+      }));
+
+    // Font size varies between PDFs, so line grouping uses a tolerance derived
+    // from the text height instead of a hard-coded 2.5px value.
+    const medianHeight = (() => {
+      const h = rawItems.map(x => x.height).filter(Boolean).sort((a,b)=>a-b);
+      return h.length ? h[Math.floor(h.length / 2)] : 8;
+    })();
+    const yTolerance = Math.max(3, Math.min(8, medianHeight * 0.45));
+
+    rawItems.sort((a,b) => b.y - a.y || a.x - b.x);
+    const lines = [];
+    for (const item of rawItems){
+      let line = lines.find(l => Math.abs(l.y - item.y) <= yTolerance);
+      if (!line){
+        line = { y:item.y, items:[] };
+        lines.push(line);
+      }
+      line.items.push(item);
+    }
+    lines.sort((a,b) => b.y - a.y);
+    lines.forEach(line => line.items.sort((a,b) => a.x - b.x));
+    pages.push({ pageNo, lines });
+  }
+  return pages;
+}
+
+async function loadTesseractForPdfImport(){
+  if (window.Tesseract) return;
+  await new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+    script.onload = resolve;
+    script.onerror = () => reject(new Error('Could not load OCR support. Check your internet connection and try again.'));
+    document.head.appendChild(script);
+  });
+}
+
+async function extractPdfOcrLines(file){
+  await loadTesseractForPdfImport();
+  if (!window.pdfjsLib) throw new Error('PDF reader library is not loaded. Refresh the page and try again.');
+
+  const buffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({data: buffer}).promise;
+  const lines = [];
+
+  for (let pageNo = 1; pageNo <= pdf.numPages; pageNo++){
+    setPdfImportStatus(`OCR analysing page ${pageNo} of ${pdf.numPages}…`);
+    const page = await pdf.getPage(pageNo);
+    const viewport = page.getViewport({ scale: 2.2 });
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.ceil(viewport.width);
+    canvas.height = Math.ceil(viewport.height);
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    await page.render({ canvasContext: ctx, viewport }).promise;
+
+    const result = await Tesseract.recognize(canvas, 'eng', {
+      logger: m => {
+        if (m.status === 'recognizing text' && typeof m.progress === 'number'){
+          setPdfImportStatus(`OCR analysing page ${pageNo} of ${pdf.numPages}… ${Math.round(m.progress * 100)}%`);
+        }
+      }
+    });
+
+    const text = String(result.data && result.data.text || '');
+    text.split(/\r?\n/).map(normalisePdfText).filter(Boolean).forEach(t => lines.push(t));
+  }
+  return lines;
+}
+
+function parsePdfOcrLines(lines){
+  const products = [];
+  let currentCategory = '';
+
+  for (let i = 0; i < lines.length; i++){
+    const line = normalisePdfText(lines[i]);
+    if (!line) continue;
+
+    if (isPdfCategoryCandidate(line) && !/^\d+\s+/.test(line)){
+      const hasRowSoon = lines.slice(i + 1, i + 5).some(x => /^\d{1,4}\s+/.test(normalisePdfText(x)));
+      if (hasRowSoon) currentCategory = line;
+      continue;
+    }
+
+    const m = line.match(/^(\d{1,4})\s+(.+)$/);
+    if (!m) continue;
+
+    const serial = m[1];
+    const rest = normalisePdfText(m[2]);
+    const tokens = rest.split(/\s+/);
+    const numeric = [];
+    tokens.forEach((t, idx) => {
+      const value = pdfNumber(t);
+      if (value !== null) numeric.push({ idx, value });
+    });
+    if (!numeric.length) continue;
+
+    // OCR fallback supports both PRICE-before-PER and PER-before-PRICE layouts.
+    const unitIdx = tokens.findIndex(t => isPdfUnitText(t));
+    let priceInfo = null;
+    if (unitIdx >= 0){
+      const before = numeric.filter(x => x.idx < unitIdx);
+      const after = numeric.filter(x => x.idx > unitIdx);
+      if (before.length) priceInfo = before[before.length - 1];
+      else if (after.length) priceInfo = after[0];
+    }
+    if (!priceInfo) priceInfo = numeric.find(x => x.value > 0 && x.value < 10000000);
+    if (!priceInfo || priceInfo.value <= 0) continue;
+
+    let nameTokens = tokens.slice(0, priceInfo.idx);
+    if (unitIdx >= 0 && unitIdx < priceInfo.idx) nameTokens = tokens.slice(0, unitIdx);
+    // Remove a leading Tamil/description column only when an obvious English
+    // product name is present; otherwise preserve the extracted text.
+    let name = cleanPdfProductName(nameTokens.join(' '));
+    name = name.replace(/\s+\d+\s*\/\s*\d+\s*$/,'').trim();
+    if (!name || name.length < 2 || !currentCategory) continue;
+
+    products.push({ serial, name, category: currentCategory, price: Math.round(priceInfo.value * 100) / 100 });
+  }
+  return dedupePdfProducts(products);
+}
+
+/* ==================================================================
+   NEW: per-row Delete button in the PDF import preview table
+   Lets the admin drop rows they don't want (misreads, unwanted items,
+   OCR noise) before clicking "Import products". Reuses the existing
+   .icon-btn / .icon-btn.danger styling already used by the Products
+   and Categories tables — no new CSS added.
+   ================================================================== */
+
+function renderPdfImportPreview(products){
+  const box = document.getElementById('pdf-import-preview');
+  const actions = document.getElementById('pdf-import-actions');
+  if (!box || !actions) return;
+
+  if (!products.length){
+    box.style.display = 'none';
+    actions.style.display = 'none';
+    return;
+  }
+
+  box.innerHTML = `
+    <table>
+      <thead><tr><th>S.No</th><th>Name</th><th>Category</th><th>Actual Price</th><th></th></tr></thead>
+      <tbody>${products.map((p, idx) => `
+        <tr>
+          <td>${escapeHtml(p.serial)}</td>
+          <td class="cell-name">${escapeHtml(p.name)}</td>
+          <td>${escapeHtml(p.category)}</td>
+          <td class="mono">${money(p.price)}</td>
+          <td style="white-space:nowrap;">
+            <button type="button" class="icon-btn danger" onclick="removePdfImportRow(${idx})" title="Remove this row">Delete</button>
+          </td>
+        </tr>
+      `).join('')}</tbody>
+    </table>`;
+  box.style.display = 'block';
+  actions.style.display = 'flex';
+}
+
+function removePdfImportRow(index){
+  if (index < 0 || index >= parsedPdfProducts.length) return;
+
+  parsedPdfProducts.splice(index, 1);
+
+  if (!parsedPdfProducts.length){
+    setPdfImportStatus('All rows removed. Choose a PDF to try again.');
+    renderPdfImportPreview(parsedPdfProducts);
+    document.getElementById('pdf-import-actions').style.display = 'none';
+    return;
+  }
+
+  const categories = [...new Set(parsedPdfProducts.map(p => p.category))];
+  setPdfImportStatus(`${parsedPdfProducts.length} products in ${categories.length} categories left to import. Row removed.`, 'success');
+  renderPdfImportPreview(parsedPdfProducts);
+}
+
+async function handlePdfProductImport(file){
+  if (!file) return;
+  if (!configured()) return;
+  if (file.type && file.type !== 'application/pdf' && !/\.pdf$/i.test(file.name)){
+    setPdfImportStatus('Please select a PDF file.', 'error');
+    return;
+  }
+
+  const input = document.getElementById('product-pdf-import');
+  if (input) input.disabled = true;
+  parsedPdfProducts = [];
+  document.getElementById('pdf-import-actions').style.display = 'none';
+  document.getElementById('pdf-import-preview').style.display = 'none';
+  setPdfImportStatus('Reading PDF and analysing products…');
+
+  try{
+    // First try the real PDF text layer. This is fast and keeps exact product
+    // names even when fonts, colours and table designs are different.
+    const pages = await extractPdfPages(file);
+    parsedPdfProducts = parsePdfPages(pages);
+
+    // If the PDF has no usable text layer OR its layout is unusual, automatically
+    // fall back to OCR. This supports scanned/image PDFs and different fonts.
+    if (!parsedPdfProducts.length){
+      setPdfImportStatus('The PDF layout is different from the usual format. Switching to automatic OCR…');
+      const ocrLines = await extractPdfOcrLines(file);
+      parsedPdfProducts = parsePdfOcrLines(ocrLines);
+    }
+
+    if (!parsedPdfProducts.length){
+      throw new Error('No products could be identified. The PDF may need a clearer scan or may not contain a recognisable product table.');
+    }
+
+    const categories = [...new Set(parsedPdfProducts.map(p => p.category))];
+    setPdfImportStatus(`Found ${parsedPdfProducts.length} products in ${categories.length} categories. Review the preview, then click Import products.`, 'success');
+    renderPdfImportPreview(parsedPdfProducts);
+  } catch(err){
+    parsedPdfProducts = [];
+    setPdfImportStatus(err.message || 'Could not read the PDF.', 'error');
+  } finally {
+    if (input) input.disabled = false;
+  }
+}
+
+document.getElementById('product-pdf-import').addEventListener('change', (e) => {
+  handlePdfProductImport(e.target.files[0]);
+});
 
 async function importParsedPdfProducts(){
   if (pdfImportBusy || !parsedPdfProducts.length) return;
@@ -1042,7 +1774,6 @@ function clearPdfImport(){
   if (actions) actions.style.display = 'none';
   setPdfImportStatus('No PDF selected.');
 }
-
 
 /* ---------------- navigation ---------------- */
 
@@ -1714,6 +2445,216 @@ if (savedUser) document.getElementById('sidebar-username').textContent = savedUs
 
 attachImageUploader('p');
 loadDashboard();
+
+/* ================================================================
+   NEW: DIRECT PRICE LIST PDF UPLOAD TO GOOGLE DRIVE
+   Existing PDF link functionality is left untouched.
+   Selecting a PDF automatically uploads it to Drive and then
+   saves the returned Drive URL using the existing setPriceListPdf
+   action.
+   ================================================================ */
+
+(function(){
+
+  const fileInput = document.getElementById('price-list-pdf-file');
+  const selectedEl = document.getElementById('price-list-pdf-selected');
+  const statusEl = document.getElementById('price-list-pdf-status');
+  const progressEl = document.getElementById('price-list-pdf-progress');
+  const progressBar = document.getElementById('price-list-pdf-progress-bar');
+  const resetBtn = document.getElementById('price-list-pdf-reset');
+
+  if (!fileInput || !selectedEl || !statusEl || !progressEl || !progressBar || !resetBtn) {
+    return;
+  }
+
+  let uploading = false;
+
+  function setPricePdfStatus(message, type){
+    statusEl.textContent = message;
+    statusEl.className = 'price-pdf-status' + (type ? ' ' + type : '');
+  }
+
+  function resetPricePdfUploader(){
+    if (uploading) return;
+
+    fileInput.value = '';
+    selectedEl.textContent = '';
+    selectedEl.style.display = 'none';
+
+    progressEl.style.display = 'none';
+    progressBar.style.width = '0%';
+
+    resetBtn.style.display = 'none';
+
+    setPricePdfStatus('No PDF selected.');
+  }
+
+  function showSelectedFile(file){
+    const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+
+    selectedEl.textContent =
+      '📄 ' + file.name + ' (' + sizeMB + ' MB)';
+
+    selectedEl.style.display = 'block';
+  }
+
+  async function uploadPriceListPdf(file){
+
+    if (!file || uploading) return;
+
+    if (!configured()) return;
+
+    if (
+      file.type !== 'application/pdf' &&
+      !/\.pdf$/i.test(file.name)
+    ){
+      showToast('Please select a PDF file only.', true);
+      resetPricePdfUploader();
+      return;
+    }
+
+    /* Keep the upload comfortably below the Apps Script request limit. */
+    if (file.size > 15 * 1024 * 1024){
+      showToast('PDF is larger than 15 MB. Please select a smaller PDF.', true);
+      resetPricePdfUploader();
+      return;
+    }
+
+    uploading = true;
+    fileInput.disabled = true;
+    resetBtn.style.display = 'none';
+
+    showSelectedFile(file);
+
+    progressEl.style.display = 'block';
+    progressBar.style.width = '5%';
+
+    setPricePdfStatus(
+      'Reading PDF and preparing upload…',
+      'uploading'
+    );
+
+    try{
+
+      const dataUrl = await new Promise((resolve, reject) => {
+
+        const reader = new FileReader();
+
+        reader.onload = () => resolve(reader.result);
+
+        reader.onerror = () => {
+          reject(new Error('Could not read the PDF file.'));
+        };
+
+        reader.onprogress = (event) => {
+          if (event.lengthComputable){
+            const percent = Math.max(
+              5,
+              Math.round((event.loaded / event.total) * 30)
+            );
+
+            progressBar.style.width = percent + '%';
+          }
+        };
+
+        reader.readAsDataURL(file);
+
+      });
+
+      progressBar.style.width = '35%';
+
+      setPricePdfStatus(
+        'Uploading PDF to Google Drive…',
+        'uploading'
+      );
+
+      const result = await apiPost('uploadPriceListPdf', {
+        pdfData: dataUrl,
+        pdfName: file.name,
+        pdfType: file.type || 'application/pdf'
+      });
+
+      if (!result || !result.driveUrl){
+        throw new Error(
+          'Google Drive did not return a PDF link.'
+        );
+      }
+
+      progressBar.style.width = '80%';
+
+      setPricePdfStatus(
+        'PDF uploaded. Saving it as the active price list…',
+        'uploading'
+      );
+
+      /*
+       * Reuse your EXISTING setPriceListPdf backend action.
+       * Nothing else in the existing PDF system is changed.
+       */
+      await apiPost('setPriceListPdf', {
+        link: result.driveUrl
+      });
+
+      progressBar.style.width = '100%';
+
+      setPricePdfStatus(
+        'Price list PDF uploaded and saved successfully ✓',
+        'success'
+      );
+
+      showToast('Price list PDF updated successfully');
+
+      /*
+       * Refresh the Current PDF section so the newly uploaded
+       * Drive URL appears immediately.
+       */
+      await loadPdf();
+
+      resetBtn.style.display = 'inline-flex';
+
+    } catch(err){
+
+      console.error('Price list PDF upload error:', err);
+
+      progressBar.style.width = '0%';
+
+      setPricePdfStatus(
+        err.message || 'PDF upload failed. Please try again.',
+        'error'
+      );
+
+      showToast(
+        err.message || 'PDF upload failed',
+        true
+      );
+
+      resetBtn.style.display = 'inline-flex';
+
+    } finally {
+
+      uploading = false;
+      fileInput.disabled = false;
+
+    }
+  }
+
+  fileInput.addEventListener('change', function(){
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    /*
+     * User only needs to choose the PDF.
+     * Upload starts automatically.
+     */
+    uploadPriceListPdf(file);
+  });
+
+  resetBtn.addEventListener('click', function(){
+    resetPricePdfUploader();
+  });
+
+})();
+
 </script>
 
 </body>
