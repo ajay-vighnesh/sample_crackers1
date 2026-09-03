@@ -532,7 +532,7 @@ body {
   width: 36px;
   height: 36px;
   object-fit: contain;
-  filter: brightness(0) invert(1);
+  /* filter: brightness(0) invert(1); */
 }
 #stickyCartCount {
   position: absolute;
