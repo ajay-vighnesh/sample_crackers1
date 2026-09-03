@@ -504,6 +504,27 @@
       </div>
     </div>
 
+
+      <div class="card">
+      <h2>Import products from price list PDF</h2>
+      <div class="pdf-import-drop">
+        <div class="pdf-import-info">
+          <div class="pdf-import-title">Upload your crackers price-list PDF</div>
+          <!-- <div class="pdf-import-help">The importer dynamically analyses the PDF layout to find category, product name and price columns. It supports different fonts, column positions and table designs, and automatically uses OCR when the PDF is scanned/image-based. Missing categories are created automatically with an 80% discount.</div> -->
+        </div>
+        <label class="pdf-import-file">
+          Choose PDF
+          <input type="file" id="product-pdf-import" accept="application/pdf,.pdf">
+        </label>
+      </div>
+      <div id="pdf-import-status" class="pdf-import-status">No PDF selected.</div>
+      <div id="pdf-import-preview" class="pdf-import-preview"></div>
+      <div id="pdf-import-actions" class="pdf-import-actions">
+        <button type="button" class="btn btn-primary" id="pdf-import-submit" onclick="importParsedPdfProducts()">Import products</button>
+        <button type="button" class="btn btn-ghost" onclick="clearPdfImport()">Clear</button>
+      </div>
+    </div>
+
     <div class="card">
       <h2>Add a product</h2>
       <form id="product-form">
@@ -921,6 +942,107 @@ function resetImageWidget(prefix){
   if (statusEl){ statusEl.textContent = 'JPG, PNG, WEBP or GIF, up to 4 MB. Uploaded straight to Drive.'; statusEl.className = 'upload-status'; }
   if (hiddenInput) hiddenInput.value = '';
 }
+
+
+
+async function importParsedPdfProducts(){
+  if (pdfImportBusy || !parsedPdfProducts.length) return;
+  if (!configured()) return;
+
+  pdfImportBusy = true;
+  const btn = document.getElementById('pdf-import-submit');
+  btn.disabled = true;
+  setPdfImportStatus(`Preparing ${parsedPdfProducts.length} products…`);
+
+  try{
+    // Refresh categories/products first so existing records are reused.
+    const [{ categories }, { products }] = await Promise.all([
+      apiGet('listCategories'),
+      apiGet('listProducts')
+    ]);
+    categoriesCache = categories;
+    productsCache = products;
+
+    const categoryMap = new Map(categories.map(c => [String(c.name).trim().toLowerCase(), c]));
+    const productKeys = new Set(products.map(p =>
+      `${String(catName(p.category_id)).trim().toLowerCase()}|${String(p.name).trim().toLowerCase()}|${Number(p.price)}`
+    ));
+
+    let createdCategories = 0;
+    let addedProducts = 0;
+    let skippedProducts = 0;
+
+    // Create missing categories first. 80 is the offer percentage shown by
+    // the uploaded price-list format; the product price remains Actual Price.
+    for (const item of parsedPdfProducts){
+      const key = item.category.trim().toLowerCase();
+      if (categoryMap.has(key)) continue;
+
+      const result = await apiPost('addCategory', {
+        name: item.category.trim(),
+        discount: '80'
+      });
+      createdCategories++;
+
+      // Some Apps Script versions return the created category directly.
+      if (result && result.category){
+        categoryMap.set(key, result.category);
+      } else {
+        const refreshed = await apiGet('listCategories');
+        categoriesCache = refreshed.categories;
+        const created = refreshed.categories.find(c => String(c.name).trim().toLowerCase() === key);
+        if (!created) throw new Error(`Category "${item.category}" was created but could not be found afterwards.`);
+        categoryMap.set(key, created);
+      }
+    }
+
+    for (let i = 0; i < parsedPdfProducts.length; i++){
+      const item = parsedPdfProducts[i];
+      const category = categoryMap.get(item.category.trim().toLowerCase());
+      if (!category) throw new Error(`Category not found: ${item.category}`);
+
+      const key = `${item.category.trim().toLowerCase()}|${item.name.trim().toLowerCase()}|${Number(item.price)}`;
+      if (productKeys.has(key)){
+        skippedProducts++;
+        continue;
+      }
+
+      await apiPost('addProduct', {
+        name: item.name,
+        category_id: category.id,
+        price: String(item.price),
+        status: 'Live',
+        image: '',
+        video: ''
+      });
+      productKeys.add(key);
+      addedProducts++;
+      setPdfImportStatus(`Importing ${i + 1}/${parsedPdfProducts.length}…`);
+    }
+
+    await Promise.all([loadProducts(), loadCategories(), loadDashboard()]);
+    setPdfImportStatus(`Import complete: ${addedProducts} added, ${skippedProducts} already existed, ${createdCategories} new categories created.`, 'success');
+    showToast(`PDF import complete — ${addedProducts} products added`);
+  } catch(err){
+    setPdfImportStatus(err.message || 'Import failed.', 'error');
+    showToast(err.message || 'PDF import failed', true);
+  } finally {
+    pdfImportBusy = false;
+    btn.disabled = false;
+  }
+}
+
+function clearPdfImport(){
+  parsedPdfProducts = [];
+  const input = document.getElementById('product-pdf-import');
+  if (input) input.value = '';
+  const preview = document.getElementById('pdf-import-preview');
+  const actions = document.getElementById('pdf-import-actions');
+  if (preview){ preview.innerHTML = ''; preview.style.display = 'none'; }
+  if (actions) actions.style.display = 'none';
+  setPdfImportStatus('No PDF selected.');
+}
+
 
 /* ---------------- navigation ---------------- */
 
